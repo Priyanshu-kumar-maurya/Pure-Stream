@@ -255,6 +255,8 @@ const AppState = {
   audioMode: false,
   engine: 'nocookie', // 'nocookie', 'youtube', 'yewtu', 'piped'
   targetResumeSeconds: 0,
+  currentPlaybackSeconds: 0,
+  playbackTimer: null,
   
   pomodoro: {
     isRunning: false,
@@ -408,7 +410,7 @@ function getEmbedUrl(videoId, engine = AppState.engine, startSeconds = 0) {
 
   switch (engine) {
     case 'youtube':
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1${startParam}${loopParam}`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1${startParam}${loopParam}`;
     case 'yewtu':
     case 'invidious-1':
       return `https://yewtu.be/embed/${videoId}?autoplay=1${startParam}`;
@@ -417,7 +419,7 @@ function getEmbedUrl(videoId, engine = AppState.engine, startSeconds = 0) {
       return `https://piped.video/embed/${videoId}?autoplay=1${startParam}`;
     case 'nocookie':
     default:
-      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1${startParam}${loopParam}`;
+      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1${startParam}${loopParam}`;
   }
 }
 
@@ -460,10 +462,53 @@ function showLoader(visible) {
 // ==========================================
 // Video Loading, Smart Resume & Playback
 // ==========================================
+function startPlaybackTimer() {
+  if (AppState.playbackTimer) clearInterval(AppState.playbackTimer);
+  AppState.playbackTimer = setInterval(() => {
+    AppState.currentPlaybackSeconds = (AppState.currentPlaybackSeconds || 0) + 1;
+    // Auto-save progress every 5 seconds for smart resume
+    if (AppState.currentPlaybackSeconds % 5 === 0 && AppState.currentVideoId) {
+      saveCurrentProgress(AppState.currentVideoId, AppState.currentPlaybackSeconds);
+    }
+  }, 1000);
+}
+
+function saveCurrentProgress(videoId, seconds) {
+  if (!videoId || seconds < 5) return;
+  const map = getProgressMap();
+  map[videoId] = {
+    seconds: Math.floor(seconds),
+    timeStr: formatSecondsToTime(seconds),
+    updatedAt: Date.now()
+  };
+  localStorage.setItem('purestream_progress', JSON.stringify(map));
+}
+
+function seekVideo(deltaSeconds) {
+  const newSeconds = Math.max(0, (AppState.currentPlaybackSeconds || 0) + deltaSeconds);
+  AppState.currentPlaybackSeconds = newSeconds;
+
+  const iframe = document.getElementById('pure-iframe');
+  if (iframe && iframe.contentWindow) {
+    try {
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'seekTo',
+        args: [newSeconds, true]
+      }), '*');
+    } catch (e) {}
+  }
+
+  saveCurrentProgress(AppState.currentVideoId, newSeconds);
+  showToast(`${deltaSeconds > 0 ? '⏩ +10s' : '⏪ -10s'} (${formatSecondsToTime(newSeconds)})`, 'info');
+}
+
 async function loadVideo(videoId, triggerAutoScroll = true) {
   if (!videoId) return;
 
   AppState.currentVideoId = videoId;
+  AppState.currentPlaybackSeconds = AppState.targetResumeSeconds || 0;
+  startPlaybackTimer();
 
   // Check saved progress for Smart Resume
   checkSmartResume(videoId);
@@ -752,7 +797,7 @@ function parseTimeToSeconds(timeStr) {
 }
 
 function openAddNoteModal() {
-  DOM.inputNoteTime.value = '00:10:00';
+  DOM.inputNoteTime.value = formatSecondsToTime(AppState.currentPlaybackSeconds || 0);
   DOM.inputNoteText.value = '';
   DOM.modalAddNote.classList.add('active');
   setTimeout(() => DOM.inputNoteText.focus(), 100);
@@ -1341,12 +1386,75 @@ function switchTab(targetTab) {
     else b.classList.remove('active');
   });
 
+  // Sync mobile bottom dock items
+  document.querySelectorAll('.mobile-nav-item').forEach(mBtn => {
+    if (mBtn.dataset.tab === targetTab) {
+      mBtn.classList.add('active');
+    } else if (mBtn.dataset.tab) {
+      mBtn.classList.remove('active');
+    }
+  });
+
   document.querySelectorAll('.tab-pane').forEach(pane => {
     pane.classList.remove('active');
   });
 
   const activePane = document.getElementById(`pane-${targetTab}`);
   if (activePane) activePane.classList.add('active');
+}
+
+function initMobileBottomNav() {
+  const mNavStudy = document.getElementById('m-nav-study');
+  const mNavCoding = document.getElementById('m-nav-coding');
+  const mNavSongs = document.getElementById('m-nav-songs');
+  const mNavHistory = document.getElementById('m-nav-history');
+  const mNavSearch = document.getElementById('m-nav-search');
+
+  const scrollToTabs = () => {
+    const tabsSec = document.querySelector('.content-tabs-section');
+    if (tabsSec) {
+      tabsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  if (mNavStudy) {
+    mNavStudy.addEventListener('click', () => {
+      switchTab('study');
+      scrollToTabs();
+    });
+  }
+  if (mNavCoding) {
+    mNavCoding.addEventListener('click', () => {
+      switchTab('coding');
+      scrollToTabs();
+    });
+  }
+  if (mNavSongs) {
+    mNavSongs.addEventListener('click', () => {
+      switchTab('songs');
+      scrollToTabs();
+    });
+  }
+  if (mNavHistory) {
+    mNavHistory.addEventListener('click', () => {
+      switchTab('history');
+      scrollToTabs();
+    });
+  }
+  if (mNavSearch) {
+    mNavSearch.addEventListener('click', () => {
+      const searchSec = document.getElementById('search-section');
+      if (searchSec) {
+        searchSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      setTimeout(() => {
+        if (DOM.videoInput) {
+          DOM.videoInput.focus();
+          DOM.videoInput.select();
+        }
+      }, 300);
+    });
+  }
 }
 
 // ==========================================
@@ -1359,6 +1467,19 @@ function initEventListeners() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  // Mobile Touch Rewind & Forward (-10s / +10s)
+  const btnTouchRewind = document.getElementById('btn-touch-rewind');
+  const btnTouchForward = document.getElementById('btn-touch-forward');
+  if (btnTouchRewind) {
+    btnTouchRewind.addEventListener('click', () => seekVideo(-10));
+  }
+  if (btnTouchForward) {
+    btnTouchForward.addEventListener('click', () => seekVideo(10));
+  }
+
+  // Mobile Bottom App Dock
+  initMobileBottomNav();
 
   // Engine quick pills
   DOM.enginePills.forEach(pill => {

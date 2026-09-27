@@ -2,9 +2,17 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PureStream — Ad-Free Student Study &amp; Music Hub (Direct Search &amp; Long Videos)</title>
-  <meta name="description" content="Watch YouTube long lectures, marathon revision one-shots, coding courses and non-stop songs in 1080p/4K with ZERO ADS. Direct YouTube search, timestamp notes, and study tools built for students.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>PureStream — Ad-Free Student Study &amp; Music Hub (Phone &amp; Desktop)</title>
+  <meta name="description" content="Watch YouTube long lectures, marathon revision one-shots, coding courses and non-stop songs in 1080p/4K with ZERO ADS. Mobile optimized, direct search, timestamp notes, and study tools.">
+  <meta name="theme-color" content="#07080a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +36,7 @@
         </div>
         <div class="brand-text">
           <span class="brand-title">Pure<span class="text-accent">Stream</span></span>
-          <span class="brand-tagline">🎓 Student Study &amp; Non-Stop Music Hub</span>
+          <span class="brand-tagline">🎓 Student Study &amp; Music Hub</span>
         </div>
       </div>
 
@@ -40,7 +48,7 @@
             <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
             <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
           </svg>
-          <span class="btn-text">Focus Mode</span>
+          <span class="btn-text">Focus</span>
         </button>
 
         <!-- Pomodoro Timer Trigger -->
@@ -49,20 +57,7 @@
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span id="pomodoro-header-text" class="btn-text">Study Timer</span>
-        </button>
-
-        <button id="btn-ambient-toggle" class="header-btn" title="Ambient Glow Toggle (सिनेमा बैकलाइट)">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-          </svg>
-          <span class="btn-text">Glow</span>
+          <span id="pomodoro-header-text" class="btn-text">Timer</span>
         </button>
 
         <button id="btn-theater-toggle" class="header-btn" title="Theater Mode (T)">
@@ -89,7 +84,7 @@
   <main class="main-container">
 
     <!-- Direct YouTube Search & Discovery Center -->
-    <section class="search-section">
+    <section class="search-section" id="search-section">
       <div class="search-card">
         <div class="search-input-wrapper">
           <div class="search-icon-left">
@@ -103,7 +98,7 @@
             type="text" 
             id="video-input" 
             class="video-input" 
-            placeholder="YouTube video directly search karein (e.g. Physics Wallah One Shot, Arijit Singh Jukebox, Python Full Course)..." 
+            placeholder="Search YouTube video or lecture directly..." 
             autocomplete="off"
             spellcheck="false"
           >
@@ -113,11 +108,11 @@
 
           <div class="input-actions-right">
             <!-- Long Video Filter Toggle -->
-            <label class="filter-toggle-label" title="Sirf 20 min se lambe lectures, marathons aur albums dikhayein">
+            <label class="filter-toggle-label" title="Sirf 20 min se lambe lectures aur albums dikhayein">
               <input type="checkbox" id="check-long-only" checked>
               <span class="filter-pill">
                 <span class="filter-icon">⏳</span>
-                <span class="filter-text">Long Videos Only</span>
+                <span class="filter-text">Long Videos</span>
               </span>
             </label>
 
@@ -138,14 +133,14 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <span>Search YouTube</span>
+              <span>Search</span>
             </button>
           </div>
         </div>
 
-        <!-- Quick Trending Search Tags for Students & Music -->
+        <!-- Quick Trending Search Tags for Students & Music (Touch Swipeable) -->
         <div class="quick-study-tags">
-          <span class="tag-title">⚡ Quick Topics:</span>
+          <span class="tag-title">⚡ Quick:</span>
           <button class="study-chip" data-query="Physics Wallah Class 12 One Shot">📚 PW Physics 12th</button>
           <button class="study-chip" data-query="Chemistry Complete Board Marathon One Shot">🧪 Chemistry Marathon</button>
           <button class="study-chip" data-query="Complete Python Full Course in Hindi">💻 Python Full Course (10h)</button>
@@ -158,13 +153,10 @@
         <!-- Status Guarantee Bar -->
         <div class="quick-hints">
           <span class="hint-label">🛡️ Guaranteed:</span>
-          <span class="ad-free-guarantee">Bina kisi Ads ke 100% Padhai aur Gaane</span>
+          <span class="ad-free-guarantee">Bina kisi Ads ke Padhai aur Gaane</span>
           <span class="hint-dot">•</span>
           <span class="hint-label">Direct Search:</span>
-          <span>Bar-bar link copy karne ki zaroorat nahi</span>
-          <span class="hint-dot">•</span>
-          <span class="hint-label">Quality:</span>
-          <span>1080p Full HD &amp; 4K</span>
+          <span>No copy-paste needed</span>
         </div>
       </div>
     </section>
@@ -173,13 +165,13 @@
     <section class="player-showcase" id="player-arena">
       <div class="player-wrapper" id="player-wrapper">
         
-        <!-- Multi-Engine Quick Switcher Bar (Instant 1-Click Fix) -->
+        <!-- Multi-Engine Quick Switcher Bar (Touch Scrollable on Phone) -->
         <div class="engine-quick-bar">
-          <span class="engine-tip">⚡ Playback Engine:</span>
+          <span class="engine-tip">⚡ Engine:</span>
           <button class="engine-pill active" data-engine="nocookie">⚡ NoCookie (Best)</button>
-          <button class="engine-pill" data-engine="youtube">📺 YouTube Standard</button>
-          <button class="engine-pill" data-engine="yewtu">🛡️ Invidious Stream</button>
-          <button class="engine-pill" data-engine="piped">🚀 Piped Stream</button>
+          <button class="engine-pill" data-engine="youtube">📺 YouTube Embed</button>
+          <button class="engine-pill" data-engine="yewtu">🛡️ Invidious</button>
+          <button class="engine-pill" data-engine="piped">🚀 Piped</button>
           <button id="btn-popout-player" class="engine-pill popout-btn" title="Open Clean Cinema Window (100% Guaranteed to work for ANY video)">
             🍿 Cinema Popout (100% Fix)
           </button>
@@ -192,16 +184,16 @@
           </div>
           <div class="resume-actions">
             <button id="btn-resume-accept" class="pill-btn primary">Resume Wahi Se ▶</button>
-            <button id="btn-resume-dismiss" class="pill-btn secondary">Shuru se dekhein ↺</button>
+            <button id="btn-resume-dismiss" class="pill-btn secondary">Shuru se ↺</button>
           </div>
         </div>
 
         <!-- Glow Canvas Element behind player -->
         <div class="player-ambient-ring" id="ambient-ring"></div>
 
-        <!-- Video Frame Container -->
+        <!-- Video Frame Container (Edge to Edge on Phone) -->
         <div class="video-container" id="video-container">
-          <!-- Sleek Top Progress Bar (Never blocks video clicks!) -->
+          <!-- Sleek Top Progress Bar -->
           <div id="player-progress-bar" class="player-progress-bar"></div>
           
           <!-- The IFrame will be injected here -->
@@ -227,37 +219,36 @@
           </div>
         </div>
 
-        <!-- Quality & Controls Command Bar -->
+        <!-- Quality & Mobile Touch Command Bar -->
         <div class="player-command-bar">
           <div class="command-group left">
             <div class="quality-badge-indicator" id="quality-indicator" title="Quality Settings">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/>
               </svg>
-              <span>1080p / 4K Auto-Active</span>
+              <span>1080p / 4K</span>
             </div>
-            <span class="badge-adfree">🛡️ 0 Ads Guaranteed</span>
+            <span class="badge-adfree">🛡️ 0 Ads</span>
           </div>
 
           <div class="command-group right">
+            <!-- Mobile Touch Seek Buttons -->
+            <button id="btn-touch-rewind" class="cmd-btn" title="Rewind 10 Seconds">
+              <span>⏪ 10s</span>
+            </button>
+            <button id="btn-touch-forward" class="cmd-btn" title="Forward 10 Seconds">
+              <span>10s ⏩</span>
+            </button>
+
             <!-- Loop Toggle -->
-            <button id="btn-loop-toggle" class="cmd-btn" title="Loop/Repeat Video (गाना या पढ़ाई का म्यूजिक बार-बार बजाने के लिए)">
+            <button id="btn-loop-toggle" class="cmd-btn" title="Loop/Repeat Video">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="17 1 21 5 17 9"></polyline>
                 <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
                 <polyline points="7 23 3 19 7 15"></polyline>
                 <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
               </svg>
-              <span>Loop: Off</span>
-            </button>
-
-            <!-- Sleep Timer -->
-            <button id="btn-sleep-timer" class="cmd-btn" title="Sleep Timer (सोते समय ऑटो-स्टॉप)">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              <span id="sleep-timer-text">Timer</span>
+              <span>Loop</span>
             </button>
 
             <!-- Fullscreen -->
@@ -273,8 +264,8 @@
         <div id="playback-helper-card" class="playback-helper-card">
           <div class="helper-icon">💡</div>
           <div class="helper-text">
-            <strong>Video play hone me koi pareshani aa rahi hai?</strong>
-            <span>Upar diye gaye <strong>"📺 YouTube Standard"</strong> ya <strong>"🍿 Cinema Popout (100% Fix)"</strong> button par click karein — ye bina kisi restriction ke turant play karega!</span>
+            <strong>Video play nahi hua?</strong>
+            <span>Upar diye gaye <strong>"📺 YouTube Embed"</strong> ya <strong>"🍿 Cinema Popout (100% Fix)"</strong> button par click karein!</span>
           </div>
         </div>
 
@@ -285,9 +276,9 @@
               <h1 class="video-title" id="video-title">Select or Search any Long Video / Songs to Start Watching Ad-Free</h1>
               <div class="channel-info" id="channel-info">
                 <span class="channel-avatar">🎓</span>
-                <span class="channel-name" id="channel-name">PureStream Student &amp; Music Player</span>
+                <span class="channel-name" id="channel-name">PureStream Student Player</span>
                 <span class="meta-dot">•</span>
-                <span class="badge-long" id="badge-video-duration">⏳ Long Lecture Ready</span>
+                <span class="badge-long" id="badge-video-duration">⏳ Long Video</span>
               </div>
             </div>
             
@@ -298,7 +289,7 @@
                   <path d="M12 20h9"></path>
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
-                <span>+ Add Note</span>
+                <span>+ Note</span>
               </button>
 
               <button id="btn-bookmark" class="action-btn" title="Bookmark Video (बाद में देखने के लिए)">
@@ -324,8 +315,8 @@
           <!-- Video Timestamp Notes Strip (Live during current video) -->
           <div id="video-notes-strip" class="video-notes-strip" style="display:none;">
             <div class="notes-strip-header">
-              <span class="notes-strip-title">📝 Is Lecture ke Saved Timestamps (Click karke direct wahan pahunchein):</span>
-              <button id="btn-export-notes" class="export-notes-link">Export Notes (.txt)</button>
+              <span class="notes-strip-title">📝 Is Lecture ke Timestamps:</span>
+              <button id="btn-export-notes" class="export-notes-link">Export (.txt)</button>
             </div>
             <div id="notes-chips-container" class="notes-chips-container"></div>
           </div>
@@ -333,7 +324,7 @@
       </div>
     </section>
 
-    <!-- Navigation Tabs: Search Results / Study Marathons / Coding / Music / History -->
+    <!-- Navigation Tabs (Touch Scrollable on Phone) -->
     <section class="content-tabs-section">
       <div class="tabs-nav">
         <!-- Live Search Results Tab (Highlighted when search happens) -->
@@ -342,7 +333,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span>🔍 Search Results (<span id="search-result-count">0</span>)</span>
+          <span>🔍 Results (<span id="search-result-count">0</span>)</span>
         </button>
 
         <button class="tab-btn active" data-tab="study">
@@ -350,7 +341,7 @@
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
           </svg>
-          <span>📚 Exam &amp; Revision One-Shots</span>
+          <span>📚 One-Shots</span>
         </button>
 
         <button class="tab-btn" data-tab="coding">
@@ -358,7 +349,7 @@
             <polyline points="16 18 22 12 16 6"></polyline>
             <polyline points="8 6 2 12 8 18"></polyline>
           </svg>
-          <span>💻 10+ Hour Coding Courses</span>
+          <span>💻 10h+ Coding</span>
         </button>
 
         <button class="tab-btn" data-tab="songs">
@@ -367,7 +358,7 @@
             <circle cx="6" cy="18" r="3"></circle>
             <circle cx="18" cy="16" r="3"></circle>
           </svg>
-          <span>🎵 Non-Stop Song Jukebox (1-4h)</span>
+          <span>🎵 Songs (1-4h)</span>
         </button>
 
         <button class="tab-btn" data-tab="lofi">
@@ -375,7 +366,7 @@
             <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
             <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
           </svg>
-          <span>🎧 24/7 Focus &amp; Study Lofi</span>
+          <span>🎧 24/7 Lofi</span>
         </button>
 
         <button class="tab-btn" data-tab="upsc">
@@ -384,7 +375,7 @@
             <polyline points="2 17 12 22 22 17"></polyline>
             <polyline points="2 12 12 17 22 12"></polyline>
           </svg>
-          <span>🏛️ GS &amp; Exam Marathons</span>
+          <span>🏛️ GS Marathons</span>
         </button>
 
         <button class="tab-btn" data-tab="notes">
@@ -394,7 +385,7 @@
             <line x1="16" y1="13" x2="8" y2="13"></line>
             <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
-          <span>📝 My Notes (<span id="total-notes-count">0</span>)</span>
+          <span>📝 Notes (<span id="total-notes-count">0</span>)</span>
         </button>
 
         <button class="tab-btn" data-tab="history">
@@ -421,12 +412,12 @@
           <div class="grid-header flex-between">
             <div>
               <h2 id="search-pane-heading">Live YouTube Results for: ""</h2>
-              <span class="sub-text">Click any video to play instantly in high resolution with Zero Ads</span>
+              <span class="sub-text">Click any video to play instantly with Zero Ads</span>
             </div>
           </div>
           <div id="search-loading-indicator" class="search-loading" style="display:none;">
             <div class="spinner"></div>
-            <p>Searching YouTube for lectures &amp; songs (Filtering long videos)...</p>
+            <p>Searching YouTube for lectures &amp; songs...</p>
           </div>
           <div class="video-grid" id="grid-search"></div>
         </div>
@@ -483,7 +474,7 @@
               <h2>Aapke Lecture Timestamp Notes</h2>
               <span class="sub-text">Click on any timestamp to directly jump to that part of the video</span>
             </div>
-            <button id="btn-clear-all-notes" class="pill-btn danger">Clear All Notes</button>
+            <button id="btn-clear-all-notes" class="pill-btn danger">Clear Notes</button>
           </div>
           <div id="all-notes-list" class="all-notes-list"></div>
         </div>
@@ -492,7 +483,7 @@
         <div class="tab-pane" id="pane-history">
           <div class="grid-header flex-between">
             <div>
-              <h2>Aapka Watch History (With Saved Timestamps)</h2>
+              <h2>Aapka Watch History</h2>
               <span class="sub-text">Resume your long lectures exactly where you left off</span>
             </div>
             <button id="btn-clear-history" class="pill-btn danger">Clear History</button>
@@ -517,24 +508,53 @@
     <!-- Student Study Features Guide -->
     <section class="info-guide-section">
       <div class="guide-card">
+        <div class="guide-icon">📱</div>
+        <h3>Mobile &amp; Phone Friendly</h3>
+        <p>PureStream phone par ek app ki tarah chalta hai. Browser me <strong>"Add to Home Screen"</strong> karke aap ise bina URL bar ke full screen mobile app ki tarah use kar sakte hain.</p>
+      </div>
+
+      <div class="guide-card">
         <div class="guide-icon">🔍</div>
-        <h3>Direct YouTube Search (No Link Needed)</h3>
+        <h3>Direct YouTube Search</h3>
         <p>Aapko bar-bar YouTube jakar link copy-paste karne ki zaroorat nahi hai. Bas upar search bar me chapter ya gaane ka naam likhein aur <strong>Search</strong> dabayein!</p>
       </div>
 
       <div class="guide-card">
         <div class="guide-icon">⏳</div>
-        <h3>Long Videos &amp; Marathons Optimized</h3>
-        <p><strong>"Long Videos Only"</strong> filter se 1-shot revision, 6-ghante ke lectures aur full albums aasaani se milte hain. <strong>Auto-Resume</strong> feature se lambe lectures wahi se start hote hain jahan aapne pause kiya tha.</p>
-      </div>
-
-      <div class="guide-card">
-        <div class="guide-icon">⏱️</div>
-        <h3>Pomodoro Study Timer &amp; Notes</h3>
-        <p>Padhai ke beech focus banaye rakhne ke liye 25m/50m ka <strong>Pomodoro Timer</strong> aur video ke specific part ko yaad rakhne ke liye <strong>Timestamp Notes</strong> add karein.</p>
+        <h3>Long Videos &amp; Smart Resume</h3>
+        <p><strong>"Long Videos"</strong> filter se 1-shot revision aur marathons aasaani se milte hain. <strong>Auto-Resume</strong> feature se lambe lectures wahi se start hote hain jahan aapne pause kiya tha.</p>
       </div>
     </section>
   </main>
+
+  <!-- Mobile Bottom App Dock (Visible on Mobile <= 768px) -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mobile-nav-item active" data-tab="study" id="m-nav-study">
+      <span class="m-nav-icon">📚</span>
+      <span class="m-nav-label">Study</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="coding" id="m-nav-coding">
+      <span class="m-nav-icon">💻</span>
+      <span class="m-nav-label">Coding</span>
+    </button>
+    <button class="mobile-nav-item search-center-btn" id="m-nav-search" title="Direct Search">
+      <div class="search-bubble">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <span class="m-nav-label">Search</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="songs" id="m-nav-songs">
+      <span class="m-nav-icon">🎵</span>
+      <span class="m-nav-label">Music</span>
+    </button>
+    <button class="mobile-nav-item" data-tab="history" id="m-nav-history">
+      <span class="m-nav-icon">🕒</span>
+      <span class="m-nav-label">History</span>
+    </button>
+  </nav>
 
   <!-- Add Note Modal -->
   <div class="modal-backdrop" id="modal-add-note">
