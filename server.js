@@ -169,27 +169,46 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Static File Serving
-  let reqPath = pathname === '/' ? '/index.html' : pathname;
-  let filePath = path.join(__dirname, reqPath);
+  let reqPath = (pathname === '/' || !pathname) ? 'index.html' : pathname.replace(/^\/+/, '');
+  
+  // Safe path search across Vercel serverless Lambda and local environments
+  const candidatePaths = [
+    path.join(__dirname, reqPath),
+    path.join(process.cwd(), reqPath),
+    path.join(__dirname, 'public', reqPath),
+    path.join(process.cwd(), 'public', reqPath),
+    path.resolve(reqPath)
+  ];
 
-  const ext = path.extname(filePath).toLowerCase();
+  let resolvedPath = null;
+  for (const cp of candidatePaths) {
+    try {
+      if (fs.existsSync(cp) && fs.statSync(cp).isFile()) {
+        resolvedPath = cp;
+        break;
+      }
+    } catch (e) {}
+  }
+
+  if (!resolvedPath) {
+    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('<h1>404 Not Found — PureStream</h1>');
+    return;
+  }
+
+  const ext = path.extname(resolvedPath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-  fs.readFile(filePath, (err, content) => {
+  fs.readFile(resolvedPath, (err, content) => {
     if (err) {
-      if (err.code === 'ENOENT') {
-        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end('<h1>404 Not Found — PureStream</h1>');
-      } else {
-        res.writeHead(500);
-        res.end(`Server Error: ${err.code}`);
-      }
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end(`Server Error: ${err.code}`);
     } else {
       res.writeHead(200, { 
         'Content-Type': contentType,
         'Cache-Control': 'no-cache'
       });
-      res.end(content, 'utf-8');
+      res.end(content);
     }
   });
 });
