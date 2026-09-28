@@ -1,0 +1,16 @@
+{
+  "name": "pure-stream",
+  "version": "1.0.0",
+  "description": "PureStream — Ad-Free Student Study & Music Hub (Phone & Desktop)",
+  "main": "server.js",
+  "scripts": {
+    "build": "echo 'Build ready'",
+    "start": "node server.js"
+  },
+  "keywords": ["youtube", "adfree", "study", "music", "pwa", "education"],
+  "author": "Priyanshu",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
