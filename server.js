@@ -99,6 +99,63 @@ async function searchYouTube(query, longOnly = false) {
   return videos;
 }
 
+// Fallback search mirrors
+async function searchFallbackMirrors(query, longOnly = false) {
+  const mirrors = [
+    'https://yewtu.be',
+    'https://iv.ggtyler.dev',
+    'https://inv.nadeko.net',
+    'https://invidious.nerdvpn.de',
+    'https://invidious.jing.rocks'
+  ];
+
+  for (const mirror of mirrors) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(`${mirror}/api/v1/search?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const raw = await res.json();
+        if (Array.isArray(raw) && raw.length > 0) {
+          const videos = raw.filter(item => item.type === 'video').map(v => {
+            const sec = v.lengthSeconds || 0;
+            const hrs = Math.floor(sec / 3600);
+            const mins = Math.floor((sec % 3600) / 60);
+            const secs = sec % 60;
+            const durStr = hrs > 0 
+              ? `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+              : `${mins}:${secs.toString().padStart(2, '0')}`;
+
+            return {
+              id: v.videoId,
+              title: v.title || '',
+              channel: v.author || '',
+              duration: durStr,
+              durationSec: sec,
+              isLong: sec >= 1200,
+              views: `${(v.viewCount || 0).toLocaleString()} views`,
+              published: v.publishedText || '',
+              thumb: v.videoThumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`
+            };
+          });
+
+          if (longOnly) {
+            const longVids = videos.filter(v => v.isLong);
+            return longVids.length > 0 ? longVids : videos;
+          }
+          return videos;
+        }
+      }
+    } catch (e) {}
+  }
+  return [];
+}
+
 // Google Search Auto-Suggest
 async function getSuggestions(query) {
   try {
@@ -138,12 +195,21 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
-      const results = await searchYouTube(q, longOnly);
+      let results = await searchYouTube(q, longOnly);
+      if (!results || results.length === 0) {
+        results = await searchFallbackMirrors(q, longOnly);
+      }
       res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(JSON.stringify({ query: q, count: results.length, results }));
     } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Failed to search YouTube', details: err.message }));
+      try {
+        const results = await searchFallbackMirrors(q, longOnly);
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ query: q, count: results.length, results }));
+      } catch (fallbackErr) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Failed to search YouTube', details: err.message }));
+      }
     }
     return;
   }

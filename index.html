@@ -86,7 +86,7 @@
     <!-- Direct YouTube Search & Discovery Center -->
     <section class="search-section" id="search-section">
       <div class="search-card">
-        <div class="search-input-wrapper">
+        <form id="search-form" class="search-input-wrapper" action="javascript:void(0);">
           <div class="search-icon-left">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
@@ -95,12 +95,13 @@
           </div>
 
           <input 
-            type="text" 
+            type="search" 
             id="video-input" 
             class="video-input" 
             placeholder="Search YouTube video or lecture directly..." 
             autocomplete="off"
             spellcheck="false"
+            enterkeyhint="search"
           >
 
           <!-- Auto-Suggest Dropdown Box -->
@@ -116,7 +117,7 @@
               </span>
             </label>
 
-            <button id="btn-paste-clipboard" class="pill-btn secondary" title="Clipboard se link paste karein">
+            <button type="button" id="btn-paste-clipboard" class="pill-btn secondary" title="Clipboard se link paste karein">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
@@ -124,11 +125,11 @@
               <span>Paste</span>
             </button>
 
-            <button id="btn-clear-input" class="pill-btn icon-only" title="Clear input" style="display:none;">
+            <button type="button" id="btn-clear-input" class="pill-btn icon-only" title="Clear input" style="display:none;">
               ✕
             </button>
 
-            <button id="btn-search-submit" class="pill-btn primary">
+            <button type="submit" id="btn-search-submit" class="pill-btn primary" title="Search YouTube">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -136,7 +137,7 @@
               <span>Search</span>
             </button>
           </div>
-        </div>
+        </form>
 
         <!-- Quick Trending Search Tags for Students & Music (Touch Swipeable) -->
         <div class="quick-study-tags">
@@ -202,9 +203,12 @@
             src="https://www.youtube-nocookie.com/embed/LXb3EKWsInQ?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1" 
             title="PureStream Video Player" 
             frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; screen-wake-lock" 
             allowfullscreen
           ></iframe>
+
+          <!-- Hidden Keep-Alive Video Heartbeat (Universal Mobile Screen Lock Prevention) -->
+          <video id="wake-lock-heartbeat" loop playsinline muted style="display:none; width:1px; height:1px;"></video>
         </div>
 
         <!-- Audio Distraction-Free Overlay (When Audio Mode is active) -->
@@ -229,6 +233,11 @@
               <span>1080p / 4K</span>
             </div>
             <span class="badge-adfree">🛡️ 0 Ads</span>
+            <!-- Screen Awake (Lock Prevention) Status Badge -->
+            <div class="screen-wake-badge active" id="screen-wake-badge" title="Phone screen lock is prevented while studying">
+              <span class="wake-dot"></span>
+              <span id="wake-badge-text">🔆 Screen Awake: ON</span>
+            </div>
           </div>
 
           <div class="command-group right">

@@ -271,6 +271,7 @@ const AppState = {
 // DOM Elements
 // ==========================================
 const DOM = {
+  searchForm: document.getElementById('search-form'),
   videoInput: document.getElementById('video-input'),
   searchSuggestions: document.getElementById('search-suggestions'),
   checkLongOnly: document.getElementById('check-long-only'),
@@ -280,6 +281,9 @@ const DOM = {
   videoContainer: document.getElementById('video-container'),
   playerWrapper: document.getElementById('player-wrapper'),
   playerProgressBar: document.getElementById('player-progress-bar'),
+  screenWakeBadge: document.getElementById('screen-wake-badge'),
+  wakeBadgeText: document.getElementById('wake-badge-text'),
+  wakeLockHeartbeat: document.getElementById('wake-lock-heartbeat'),
   resumeBanner: document.getElementById('resume-banner'),
   resumeTimeStr: document.getElementById('resume-time-str'),
   btnResumeAccept: document.getElementById('btn-resume-accept'),
@@ -436,9 +440,10 @@ function mountPlayer(videoId, startSeconds = 0) {
       src="${embedUrl}" 
       title="PureStream Video Player" 
       frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; screen-wake-lock" 
       allowfullscreen
     ></iframe>
+    <video id="wake-lock-heartbeat" loop playsinline muted style="display:none; width:1px; height:1px;"></video>
   `;
 
   // Update DOM reference
@@ -503,12 +508,68 @@ function seekVideo(deltaSeconds) {
   showToast(`${deltaSeconds > 0 ? '⏩ +10s' : '⏪ -10s'} (${formatSecondsToTime(newSeconds)})`, 'info');
 }
 
+// ==========================================
+// Screen Wake Lock (Phone Screen Lock Prevention)
+// ==========================================
+let screenWakeLock = null;
+
+async function enableScreenWakeLock() {
+  // 1. Try modern Screen Wake Lock API
+  if ('wakeLock' in navigator) {
+    try {
+      if (screenWakeLock !== null && !screenWakeLock.released) {
+        updateWakeBadge(true);
+        return;
+      }
+      screenWakeLock = await navigator.wakeLock.request('screen');
+      screenWakeLock.addEventListener('release', () => {
+        screenWakeLock = null;
+        updateWakeBadge(false);
+      });
+      updateWakeBadge(true);
+      return;
+    } catch (err) {
+      console.warn('Screen Wake Lock request failed:', err);
+    }
+  }
+
+  // 2. Fallback: Hidden media heartbeat prevents mobile sleep
+  fallbackHeartbeatLock();
+}
+
+function fallbackHeartbeatLock() {
+  const video = DOM.wakeLockHeartbeat || document.getElementById('wake-lock-heartbeat');
+  if (video) {
+    try {
+      if (!video.src) {
+        video.src = 'data:video/mp4;base64,AAAAHGZ0eXBNNEVWIExpYmRhdmkxLjAuMQAAAAZpdGVtAAAAAGNvZGMAAAA';
+      }
+      video.play().then(() => updateWakeBadge(true)).catch(() => {});
+    } catch (e) {}
+  }
+}
+
+function updateWakeBadge(isActive) {
+  const badge = DOM.screenWakeBadge || document.getElementById('screen-wake-badge');
+  const badgeText = DOM.wakeBadgeText || document.getElementById('wake-badge-text');
+  if (!badge) return;
+
+  if (isActive) {
+    badge.classList.add('active');
+    if (badgeText) badgeText.textContent = '🔆 Screen Awake: ON';
+  } else {
+    badge.classList.remove('active');
+    if (badgeText) badgeText.textContent = 'Screen Awake: Off';
+  }
+}
+
 async function loadVideo(videoId, triggerAutoScroll = true) {
   if (!videoId) return;
 
   AppState.currentVideoId = videoId;
   AppState.currentPlaybackSeconds = AppState.targetResumeSeconds || 0;
   startPlaybackTimer();
+  enableScreenWakeLock();
 
   // Check saved progress for Smart Resume
   checkSmartResume(videoId);
@@ -614,19 +675,19 @@ let suggestDebounce = null;
 async function handleSearch(query) {
   if (!query || !query.trim()) {
     showToast('Kripya search karne ke liye kuch likhein!', 'warning');
-    DOM.videoInput.focus();
+    if (DOM.videoInput) DOM.videoInput.focus();
     return;
   }
 
   const q = query.trim();
-  DOM.searchSuggestions.style.display = 'none';
+  if (DOM.searchSuggestions) DOM.searchSuggestions.style.display = 'none';
 
   // If user pasted a direct YouTube link or ID, just play it immediately!
   const directId = extractYouTubeId(q);
   if (directId) {
     loadVideo(directId, true);
-    DOM.videoInput.value = '';
-    DOM.btnClearInput.style.display = 'none';
+    if (DOM.videoInput) DOM.videoInput.value = '';
+    if (DOM.btnClearInput) DOM.btnClearInput.style.display = 'none';
     return;
   }
 
@@ -638,43 +699,66 @@ async function handleSearch(query) {
   DOM.searchLoadingIndicator.style.display = 'flex';
   DOM.gridSearch.innerHTML = '';
 
+  // Auto-scroll down smoothly so user immediately sees results on mobile!
+  const paneSearch = document.getElementById('pane-search');
+  if (paneSearch) {
+    paneSearch.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   try {
-    // 1. Try local server API
+    // 1. Try local or Vercel server API
     const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&longOnly=${longOnly ? '1' : '0'}`);
     if (res.ok) {
       const data = await res.json();
-      DOM.searchLoadingIndicator.style.display = 'none';
-      renderSearchResults(data.results || []);
-      return;
+      if (data && Array.isArray(data.results) && data.results.length > 0) {
+        DOM.searchLoadingIndicator.style.display = 'none';
+        renderSearchResults(data.results);
+        return;
+      }
     }
   } catch (err) {
-    console.warn('Local search API unreachable, falling back to public mirrors:', err);
+    console.warn('Primary search API unreachable, falling back to public mirrors:', err);
   }
 
-  // 2. Client-side fallback if running via direct file:// without server
+  // 2. Client-side fallback if primary returned 0 results or had an error
   await performFallbackSearch(q, longOnly);
 }
 
 async function performFallbackSearch(query, longOnly) {
-  const publicMirrors = ['https://yewtu.be', 'https://iv.ggtyler.dev', 'https://invidious.nerdvpn.de'];
+  const publicMirrors = [
+    'https://yewtu.be',
+    'https://iv.ggtyler.dev',
+    'https://inv.nadeko.net',
+    'https://invidious.nerdvpn.de',
+    'https://invidious.jing.rocks'
+  ];
   let videos = [];
 
   for (const mirror of publicMirrors) {
     try {
-      const res = await fetch(`${mirror}/api/v1/search?q=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(4000) });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${mirror}/api/v1/search?q=${encodeURIComponent(query)}`, { 
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      clearTimeout(timeout);
+
       if (res.ok) {
         const raw = await res.json();
-        videos = raw.filter(item => item.type === 'video').map(v => ({
-          id: v.videoId,
-          title: v.title,
-          channel: v.author,
-          duration: formatSecondsToTime(v.lengthSeconds),
-          durationSec: v.lengthSeconds,
-          isLong: v.lengthSeconds >= 1200,
-          views: `${(v.viewCount || 0).toLocaleString()} views`,
-          thumb: v.videoThumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`
-        }));
-        if (videos.length > 0) break;
+        if (Array.isArray(raw) && raw.length > 0) {
+          videos = raw.filter(item => item.type === 'video').map(v => ({
+            id: v.videoId,
+            title: v.title || '',
+            channel: v.author || '',
+            duration: formatSecondsToTime(v.lengthSeconds || 0),
+            durationSec: v.lengthSeconds || 0,
+            isLong: (v.lengthSeconds || 0) >= 1200,
+            views: `${(v.viewCount || 0).toLocaleString()} views`,
+            thumb: v.videoThumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`
+          }));
+          if (videos.length > 0) break;
+        }
       }
     } catch (e) {}
   }
@@ -695,8 +779,8 @@ function renderSearchResults(videos) {
   if (videos.length === 0) {
     DOM.gridSearch.innerHTML = `
       <div class="empty-state">
-        <p>Koi results nahi mile. Dusra query try karein!</p>
-        <p style="font-size:0.8rem; margin-top:6px;">💡 Tip: "start.bat" chala kar website kholein taaki fastest direct search mile.</p>
+        <p>Koi results nahi mile. Dusra topic ya gaane ka naam try karein!</p>
+        <p style="font-size:0.8rem; margin-top:6px;">💡 Tip: Sirf topic likhein (jaise "PW Physics", "Arijit Mashup", "UPSC History")</p>
       </div>
     `;
     return;
@@ -752,11 +836,17 @@ function renderSuggestions(list) {
     const div = document.createElement('div');
     div.className = 'suggest-item';
     div.innerHTML = `<span class="suggest-icon">🔍</span><span>${escapeHtml(item)}</span>`;
-    div.addEventListener('click', () => {
+    
+    const selectSuggestion = (e) => {
+      e.preventDefault();
       DOM.videoInput.value = item;
       DOM.searchSuggestions.style.display = 'none';
+      if (DOM.videoInput) DOM.videoInput.blur();
       handleSearch(item);
-    });
+    };
+
+    div.addEventListener('pointerdown', selectSuggestion);
+    div.addEventListener('click', selectSuggestion);
     DOM.searchSuggestions.appendChild(div);
   });
   DOM.searchSuggestions.style.display = 'block';
@@ -764,7 +854,7 @@ function renderSuggestions(list) {
 
 // Close suggestions on click outside
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.search-input-wrapper')) {
+  if (!e.target.closest('#search-form') && !e.target.closest('.search-input-wrapper')) {
     DOM.searchSuggestions.style.display = 'none';
   }
 });
@@ -1495,16 +1585,38 @@ function initEventListeners() {
     DOM.btnPopoutPlayer.addEventListener('click', openCinemaPopout);
   }
 
-  // Search Submit
-  DOM.btnSearchSubmit.addEventListener('click', () => {
-    handleSearch(DOM.videoInput.value);
+  // Search Form Submit (Works on Mobile Keyboard Search Button + Desktop Enter Key)
+  const searchForm = document.getElementById('search-form');
+  if (searchForm) {
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (DOM.videoInput) {
+        DOM.videoInput.blur(); // Dismiss mobile soft keyboard
+        handleSearch(DOM.videoInput.value);
+      }
+    });
+  }
+
+  // Search Submit Button Click
+  DOM.btnSearchSubmit.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (DOM.videoInput) {
+      DOM.videoInput.blur();
+      handleSearch(DOM.videoInput.value);
+    }
   });
 
   DOM.videoInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
+      DOM.videoInput.blur();
       handleSearch(DOM.videoInput.value);
     }
   });
+
+  // Screen Wake Lock Activation on first interaction (required by mobile browsers)
+  document.addEventListener('pointerdown', enableScreenWakeLock, { once: true });
+  document.addEventListener('touchstart', enableScreenWakeLock, { once: true, passive: true });
 
   // Clear Input
   DOM.btnClearInput.addEventListener('click', () => {
