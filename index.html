@@ -162,6 +162,21 @@
       </div>
     </section>
 
+    <!-- Recently Watched Horizontal Shelf (YouTube Style) -->
+    <section class="recent-history-shelf" id="recent-history-shelf" style="display:none;">
+      <div class="shelf-header flex-between">
+        <div class="shelf-title-group">
+          <span class="shelf-icon">🕒</span>
+          <h2>Aapka Watch History (Continue Watching)</h2>
+          <span class="shelf-count" id="shelf-history-count">0</span>
+        </div>
+        <button id="btn-view-all-history" class="pill-btn secondary" style="padding:0.35rem 0.75rem; font-size:0.8rem;">
+          View All History →
+        </button>
+      </div>
+      <div class="shelf-carousel" id="recent-history-carousel"></div>
+    </section>
+
     <!-- Player Showcase Arena -->
     <section class="player-showcase" id="player-arena">
       <div class="player-wrapper" id="player-wrapper">
@@ -173,6 +188,9 @@
           <button class="engine-pill" data-engine="youtube">📺 YouTube Embed</button>
           <button class="engine-pill" data-engine="yewtu">🛡️ Invidious</button>
           <button class="engine-pill" data-engine="piped">🚀 Piped</button>
+          <button id="btn-random-video" class="engine-pill random-btn" title="YouTube style: Har bar naya video chalayein">
+            🎲 Naya Video (Random)
+          </button>
           <button id="btn-popout-player" class="engine-pill popout-btn" title="Open Clean Cinema Window (100% Guaranteed to work for ANY video)">
             🍿 Cinema Popout (100% Fix)
           </button>

@@ -240,10 +240,68 @@ const CURATED_VIDEOS = {
 };
 
 // ==========================================
+// Dynamic Video Helpers (YouTube Style Diversity)
+// ==========================================
+function getAllCuratedVideos() {
+  const all = [];
+  const seen = new Set();
+  Object.values(CURATED_VIDEOS).forEach(catList => {
+    if (Array.isArray(catList)) {
+      catList.forEach(vid => {
+        if (vid && vid.id && !seen.has(vid.id)) {
+          seen.add(vid.id);
+          all.push(vid);
+        }
+      });
+    }
+  });
+  return all;
+}
+
+function getDynamicInitialVideo() {
+  const all = getAllCuratedVideos();
+  if (all.length === 0) {
+    return {
+      id: 'LXb3EKWsInQ',
+      title: 'COSTA RICA IN 4K 60fps HDR (ULTRA HD)',
+      channel: 'Jacob + Katie Schwarz',
+      thumb: 'https://i.ytimg.com/vi/LXb3EKWsInQ/hqdefault.jpg'
+    };
+  }
+
+  // Avoid repeating the exact last played video across refreshes
+  let lastPlayedId = '';
+  try {
+    lastPlayedId = localStorage.getItem('purestream_last_video_id') || '';
+  } catch (e) {}
+
+  const candidates = all.filter(v => v.id !== lastPlayedId);
+  const pool = candidates.length > 0 ? candidates : all;
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+
+  try {
+    localStorage.setItem('purestream_last_video_id', picked.id);
+  } catch (e) {}
+
+  return picked;
+}
+
+function playRandomVideo() {
+  const all = getAllCuratedVideos();
+  if (all.length === 0) return;
+  const candidates = all.filter(v => v.id !== AppState.currentVideoId);
+  const pool = candidates.length > 0 ? candidates : all;
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+
+  showToast(`🎲 Naya Video: "${picked.title.slice(0, 38)}..."`, 'info');
+  loadVideo(picked.id, true, picked.title, picked.channel, picked.thumb);
+}
+
+// ==========================================
 // Application State
 // ==========================================
 const AppState = {
-  currentVideoId: 'LXb3EKWsInQ', // Default: Costa Rica 4K (Guaranteed 100% playable)
+  currentVideoId: 'LXb3EKWsInQ', // Default fallback
   currentTitle: 'COSTA RICA IN 4K 60fps HDR (ULTRA HD)',
   currentChannel: 'Jacob + Katie Schwarz',
   currentThumb: 'https://i.ytimg.com/vi/LXb3EKWsInQ/hqdefault.jpg',
@@ -347,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   updateLibraryCounts();
   renderHistoryGrid();
+  renderRecentHistoryShelf();
   renderSavedGrid();
   renderAllNotesGrid();
 
@@ -361,8 +420,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load default showcase video immediately
-  loadVideo(AppState.currentVideoId, false);
+  // YouTube Style: Fresh dynamic video recommendation on every visit/refresh
+  const initial = getDynamicInitialVideo();
+  loadVideo(initial.id, false, initial.title, initial.channel, initial.thumb);
 });
 
 // ==========================================
@@ -563,10 +623,23 @@ function updateWakeBadge(isActive) {
   }
 }
 
-async function loadVideo(videoId, triggerAutoScroll = true) {
+async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, customChannel = null, customThumb = null) {
   if (!videoId) return;
 
   AppState.currentVideoId = videoId;
+  if (customTitle) AppState.currentTitle = customTitle;
+  if (customChannel) AppState.currentChannel = customChannel;
+  if (customThumb) AppState.currentThumb = customThumb;
+
+  // Immediately display title & channel if provided
+  if (DOM.videoTitle && customTitle) DOM.videoTitle.textContent = customTitle;
+  if (DOM.channelName && customChannel) DOM.channelName.textContent = customChannel;
+  if (customTitle) document.title = `${customTitle} — PureStream`;
+
+  try {
+    localStorage.setItem('purestream_last_video_id', videoId);
+  } catch (e) {}
+
   AppState.currentPlaybackSeconds = AppState.targetResumeSeconds || 0;
   startPlaybackTimer();
   enableScreenWakeLock();
@@ -584,7 +657,7 @@ async function loadVideo(videoId, triggerAutoScroll = true) {
   // Mount player immediately
   mountPlayer(videoId, AppState.targetResumeSeconds);
 
-  // Fetch live video metadata asynchronously
+  // Fetch live video metadata asynchronously to refine if missing
   fetchVideoMetadata(videoId);
 
   // Update UI bookmark status
@@ -593,10 +666,10 @@ async function loadVideo(videoId, triggerAutoScroll = true) {
   // Render notes for this video
   renderVideoNotesStrip(videoId);
 
-  // Record into watch history
-  addToHistory(videoId);
+  // Record into watch history immediately with metadata
+  addToHistory(videoId, customTitle, customChannel, customThumb);
 
-  if (triggerAutoScroll) {
+  if (triggerAutoScroll && DOM.playerWrapper) {
     DOM.playerWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -1145,8 +1218,8 @@ async function fetchVideoMetadata(videoId) {
         AppState.currentChannel = data.author_name || 'YouTube Educator';
         AppState.currentThumb = data.thumbnail_url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-        DOM.videoTitle.textContent = data.title;
-        DOM.channelName.textContent = AppState.currentChannel;
+        if (DOM.videoTitle) DOM.videoTitle.textContent = data.title;
+        if (DOM.channelName) DOM.channelName.textContent = AppState.currentChannel;
         document.title = `${data.title} — PureStream (Ad-Free Study)`;
 
         updateHistoryTitle(videoId, data.title, AppState.currentChannel, AppState.currentThumb);
@@ -1155,9 +1228,13 @@ async function fetchVideoMetadata(videoId) {
     }
   } catch (err) {}
 
-  DOM.videoTitle.textContent = `Playing [${videoId}] (No-Ads Mode)`;
-  DOM.channelName.textContent = 'Ad-Free Lecture / Song';
-  document.title = `PureStream — Playing [${videoId}]`;
+  if (!AppState.currentTitle || AppState.currentTitle.startsWith('Playing [')) {
+    if (DOM.videoTitle) DOM.videoTitle.textContent = `Playing [${videoId}] (No-Ads Mode)`;
+  }
+  if (!AppState.currentChannel) {
+    if (DOM.channelName) DOM.channelName.textContent = 'Ad-Free Lecture / Song';
+  }
+  document.title = `${AppState.currentTitle || 'PureStream'} — PureStream`;
 }
 
 // ==========================================
@@ -1248,17 +1325,90 @@ function saveHistory(list) {
   updateLibraryCounts();
 }
 
-function addToHistory(videoId) {
+function addToHistory(videoId, title = null, channel = null, thumb = null) {
   const history = getHistory().filter(item => item.id !== videoId);
+  const finalTitle = title || AppState.currentTitle || `YouTube Video [${videoId}]`;
+  const finalChannel = channel || AppState.currentChannel || 'PureStream';
+  const finalThumb = thumb || AppState.currentThumb || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
   history.unshift({
     id: videoId,
-    title: AppState.currentTitle || `YouTube Video [${videoId}]`,
-    channel: AppState.currentChannel || 'PureStream',
-    thumb: AppState.currentThumb || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+    title: finalTitle,
+    channel: finalChannel,
+    thumb: finalThumb,
     timestamp: Date.now()
   });
   saveHistory(history);
   renderHistoryGrid();
+  renderRecentHistoryShelf();
+}
+
+function removeFromHistory(videoId) {
+  const history = getHistory().filter(item => item.id !== videoId);
+  saveHistory(history);
+  renderHistoryGrid();
+  renderRecentHistoryShelf();
+  showToast('Video history se hata diya gaya', 'info');
+}
+
+function renderRecentHistoryShelf() {
+  const shelf = document.getElementById('recent-history-shelf');
+  const countEl = document.getElementById('shelf-history-count');
+  const carousel = document.getElementById('recent-history-carousel');
+  if (!shelf || !carousel) return;
+
+  const history = getHistory();
+  if (history.length === 0) {
+    shelf.style.display = 'none';
+    return;
+  }
+
+  shelf.style.display = 'block';
+  if (countEl) countEl.textContent = history.length;
+  carousel.innerHTML = '';
+
+  const progressMap = getProgressMap();
+  const recentItems = history.slice(0, 12); // Show top 12 recent
+
+  recentItems.forEach(item => {
+    const prog = progressMap[item.id];
+    const card = document.createElement('div');
+    card.className = 'shelf-card';
+    card.title = `${item.title} (Click to continue watching)`;
+
+    const progressHtml = prog && prog.seconds ? `
+      <div class="shelf-progress-line" style="width: 50%;"></div>
+    ` : '';
+
+    const timeLabel = prog && prog.timeStr ? `⏱️ Resumes at ${prog.timeStr}` : 'Watched';
+
+    card.innerHTML = `
+      <button class="shelf-card-del" title="History se hatayein" data-id="${item.id}">✕</button>
+      <div class="shelf-thumb-wrapper">
+        <img class="shelf-thumb" src="${item.thumb || `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`}" alt="${escapeHtml(item.title)}" loading="lazy">
+        ${progressHtml}
+      </div>
+      <div class="shelf-card-body">
+        <h4 class="shelf-card-title">${escapeHtml(item.title)}</h4>
+        <span class="shelf-card-channel">${escapeHtml(item.channel || 'YouTube')}</span>
+        <span class="shelf-card-time">${timeLabel}</span>
+      </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.shelf-card-del')) {
+        e.stopPropagation();
+        removeFromHistory(item.id);
+        return;
+      }
+      if (prog && prog.seconds) {
+        AppState.targetResumeSeconds = prog.seconds;
+      }
+      loadVideo(item.id, true, item.title, item.channel, item.thumb);
+    });
+
+    carousel.appendChild(card);
+  });
 }
 
 function updateHistoryTitle(videoId, title, channel, thumb) {
@@ -1270,6 +1420,7 @@ function updateHistoryTitle(videoId, title, channel, thumb) {
     item.thumb = thumb;
     saveHistory(history);
     renderHistoryGrid();
+    renderRecentHistoryShelf();
   }
 }
 
@@ -1279,6 +1430,7 @@ function clearHistory() {
     localStorage.removeItem('purestream_progress');
     updateLibraryCounts();
     renderHistoryGrid();
+    renderRecentHistoryShelf();
     showToast('Watch History Cleared', 'info');
   }
 }
@@ -1389,7 +1541,7 @@ function createVideoCardElement(video) {
   `;
 
   card.addEventListener('click', () => {
-    loadVideo(video.id, true);
+    loadVideo(video.id, true, video.title, video.channel, video.thumb);
   });
 
   return card;
@@ -1583,6 +1735,22 @@ function initEventListeners() {
   // Cinema Popout Fix button
   if (DOM.btnPopoutPlayer) {
     DOM.btnPopoutPlayer.addEventListener('click', openCinemaPopout);
+  }
+
+  // Random Video Button (YouTube style fresh recommendation)
+  const btnRandom = document.getElementById('btn-random-video');
+  if (btnRandom) {
+    btnRandom.addEventListener('click', playRandomVideo);
+  }
+
+  // View All History Button
+  const btnViewAllHistory = document.getElementById('btn-view-all-history');
+  if (btnViewAllHistory) {
+    btnViewAllHistory.addEventListener('click', () => {
+      switchTab('history');
+      const tabsSec = document.querySelector('.content-tabs-section');
+      if (tabsSec) tabsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   // Search Form Submit (Works on Mobile Keyboard Search Button + Desktop Enter Key)
