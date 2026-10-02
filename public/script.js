@@ -506,18 +506,18 @@ const DOM = {
 };
 
 // ==========================================
-// Initialization
+// Initialization (Bulletproof & Safe)
 // ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-  loadPreferences();
-  initCuratedGrids();
-  initTabs();
-  initEventListeners();
-  updateLibraryCounts();
-  renderHistoryGrid();
-  renderRecentHistoryShelf();
-  renderSavedGrid();
-  renderAllNotesGrid();
+function initApp() {
+  try { initCuratedGrids(); } catch (e) { console.error('initCuratedGrids error:', e); }
+  try { initTabs(); } catch (e) { console.error('initTabs error:', e); }
+  try { loadPreferences(); } catch (e) { console.error('loadPreferences error:', e); }
+  try { initEventListeners(); } catch (e) { console.error('initEventListeners error:', e); }
+  try { updateLibraryCounts(); } catch (e) { console.error('updateLibraryCounts error:', e); }
+  try { renderHistoryGrid(); } catch (e) { console.error('renderHistoryGrid error:', e); }
+  try { renderRecentHistoryShelf(); } catch (e) { console.error('renderRecentHistoryShelf error:', e); }
+  try { renderSavedGrid(); } catch (e) { console.error('renderSavedGrid error:', e); }
+  try { renderAllNotesGrid(); } catch (e) { console.error('renderAllNotesGrid error:', e); }
 
   // If URL has ?v= param, auto play it in Watch Page Mode!
   const urlParams = new URLSearchParams(window.location.search);
@@ -541,7 +541,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // YouTube Homepage Style: By default, keep player closed and show All feed!
   if (DOM.playerArena) DOM.playerArena.style.display = 'none';
   switchTab('all');
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 // ==========================================
 // Video URL & ID Extraction
@@ -2057,23 +2063,27 @@ function initEventListeners() {
   if (DOM.btnClearAllNotes) DOM.btnClearAllNotes.addEventListener('click', clearAllNotes);
 
   // Loop, Sleep Timer, Theater, Fullscreen, Bookmark, Share
-  DOM.btnLoopToggle.addEventListener('click', toggleLoop);
-  DOM.btnSleepTimer.addEventListener('click', cycleSleepTimer);
-  DOM.btnAmbientToggle.addEventListener('click', () => {
-    AppState.ambientGlow = !AppState.ambientGlow;
-    localStorage.setItem('purestream_ambient', AppState.ambientGlow ? '1' : '0');
-    updateAmbientGlow();
-    showToast(AppState.ambientGlow ? '✨ Ambient Cinema Glow: ON' : 'Ambient Glow: OFF', 'info');
-  });
-  DOM.btnTheaterToggle.addEventListener('click', toggleTheaterMode);
-  DOM.btnFullscreen.addEventListener('click', toggleFullscreen);
-  DOM.btnBookmark.addEventListener('click', toggleBookmark);
-  DOM.btnShare.addEventListener('click', shareVideo);
+  if (DOM.btnLoopToggle) DOM.btnLoopToggle.addEventListener('click', toggleLoop);
+  if (DOM.btnSleepTimer) DOM.btnSleepTimer.addEventListener('click', cycleSleepTimer);
+  if (DOM.btnAmbientToggle) {
+    DOM.btnAmbientToggle.addEventListener('click', () => {
+      AppState.ambientGlow = !AppState.ambientGlow;
+      localStorage.setItem('purestream_ambient', AppState.ambientGlow ? '1' : '0');
+      updateAmbientGlow();
+      showToast(AppState.ambientGlow ? '✨ Ambient Cinema Glow: ON' : 'Ambient Glow: OFF', 'info');
+    });
+  }
+  if (DOM.btnTheaterToggle) DOM.btnTheaterToggle.addEventListener('click', toggleTheaterMode);
+  if (DOM.btnFullscreen) DOM.btnFullscreen.addEventListener('click', toggleFullscreen);
+  if (DOM.btnBookmark) DOM.btnBookmark.addEventListener('click', toggleBookmark);
+  if (DOM.btnShare) DOM.btnShare.addEventListener('click', shareVideo);
 
   // Keyboard Shortcuts modal
-  DOM.btnShortcuts.addEventListener('click', () => {
-    DOM.modalShortcuts.classList.add('active');
-  });
+  if (DOM.btnShortcuts && DOM.modalShortcuts) {
+    DOM.btnShortcuts.addEventListener('click', () => {
+      DOM.modalShortcuts.classList.add('active');
+    });
+  }
 
   // Modals close
   document.querySelectorAll('.modal-close, .modal-backdrop').forEach(elem => {
@@ -2157,15 +2167,21 @@ function formatSecondsToTime(totalSeconds) {
 
 function updateAmbientGlow() {
   if (!AppState.ambientGlow) {
-    document.body.classList.add('ambient-off');
-    DOM.btnAmbientToggle.classList.remove('active');
-    DOM.btnAmbientToggle.querySelector('.btn-text').textContent = 'Glow: OFF';
+    if (document.body) document.body.classList.add('ambient-off');
+    if (DOM.btnAmbientToggle) {
+      DOM.btnAmbientToggle.classList.remove('active');
+      const text = DOM.btnAmbientToggle.querySelector('.btn-text');
+      if (text) text.textContent = 'Glow: OFF';
+    }
     return;
   }
 
-  document.body.classList.remove('ambient-off');
-  DOM.btnAmbientToggle.classList.add('active');
-  DOM.btnAmbientToggle.querySelector('.btn-text').textContent = 'Glow: ON';
+  if (document.body) document.body.classList.remove('ambient-off');
+  if (DOM.btnAmbientToggle) {
+    DOM.btnAmbientToggle.classList.add('active');
+    const text = DOM.btnAmbientToggle.querySelector('.btn-text');
+    if (text) text.textContent = 'Glow: ON';
+  }
 }
 
 function loadPreferences() {
