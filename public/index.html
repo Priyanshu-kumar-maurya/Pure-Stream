@@ -110,7 +110,7 @@
           <div class="input-actions-right">
             <!-- Long Video Filter Toggle -->
             <label class="filter-toggle-label" title="Sirf 20 min se lambe lectures aur albums dikhayein">
-              <input type="checkbox" id="check-long-only" checked>
+              <input type="checkbox" id="check-long-only">
               <span class="filter-pill">
                 <span class="filter-icon">⏳</span>
                 <span class="filter-text">Long Videos</span>
@@ -177,9 +177,24 @@
       <div class="shelf-carousel" id="recent-history-carousel"></div>
     </section>
 
-    <!-- Player Showcase Arena -->
-    <section class="player-showcase" id="player-arena">
+    <!-- Player Showcase Arena (Opens on video click, hidden by default on home/search) -->
+    <section class="player-showcase" id="player-arena" style="display:none;">
       <div class="player-wrapper" id="player-wrapper">
+
+        <!-- Watch View Top Back Bar -->
+        <div class="watch-nav-bar flex-between">
+          <button id="btn-back-to-feed" class="back-feed-btn" title="Back to video feed or search results">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>← Back to YouTube Feed / Search Results</span>
+          </button>
+          <div class="watch-status-pill">
+            <span class="live-pulse-dot"></span>
+            <span>Playing 100% Ad-Free</span>
+          </div>
+        </div>
         
         <!-- Multi-Engine Quick Switcher Bar (Touch Scrollable on Phone) -->
         <div class="engine-quick-bar">
@@ -347,6 +362,18 @@
             </div>
             <div id="notes-chips-container" class="notes-chips-container"></div>
           </div>
+
+          <!-- Up Next / Recommended Section below player -->
+          <div class="watch-recommendations" id="watch-recommendations">
+            <div class="grid-header flex-between" style="margin-top:1.25rem; margin-bottom:0.75rem;">
+              <div>
+                <h3 style="font-size:1.1rem; color:#fff; font-weight:700;">✨ Up Next / Recommended Videos</h3>
+                <span class="sub-text">Click any video to switch and play instantly without ads</span>
+              </div>
+            </div>
+            <div class="video-grid" id="grid-recommendations"></div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -363,7 +390,17 @@
           <span>🔍 Results (<span id="search-result-count">0</span>)</span>
         </button>
 
-        <button class="tab-btn active" data-tab="study">
+        <button class="tab-btn active" data-tab="all" id="tab-btn-all">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>All</span>
+        </button>
+
+        <button class="tab-btn" data-tab="study" id="tab-btn-study">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
@@ -441,6 +478,9 @@
               <h2 id="search-pane-heading">Live YouTube Results for: ""</h2>
               <span class="sub-text">Click any video to play instantly with Zero Ads</span>
             </div>
+            <button id="btn-back-home-search" class="pill-btn secondary" style="font-size:0.82rem;">
+              🏠 Back to Home Feed
+            </button>
           </div>
           <div id="search-loading-indicator" class="search-loading" style="display:none;">
             <div class="spinner"></div>
@@ -449,8 +489,17 @@
           <div class="video-grid" id="grid-search"></div>
         </div>
 
+        <!-- All Curated Videos Tab Pane (YouTube Homepage Feed) -->
+        <div class="tab-pane active" id="pane-all">
+          <div class="grid-header">
+            <h2>✨ Explore All Videos &amp; Marathons</h2>
+            <span class="sub-text">Physics, Chemistry, 10h coding bootcamps, and non-stop music jukeboxes</span>
+          </div>
+          <div class="video-grid" id="grid-all"></div>
+        </div>
+
         <!-- Study One-Shots Tab Pane -->
-        <div class="tab-pane active" id="pane-study">
+        <div class="tab-pane" id="pane-study">
           <div class="grid-header">
             <h2>Complete Exam One-Shot Revision Marathons (3 से 12 घंटे)</h2>
             <span class="sub-text">Physics Wallah, Chemistry &amp; Maths ke lambe lectures bina kisi commercial advertisement ke</span>

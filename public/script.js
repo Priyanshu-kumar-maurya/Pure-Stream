@@ -392,7 +392,13 @@ const DOM = {
   pomodoroLiveDisplay: document.getElementById('pomodoro-live-display'),
   pomoCountdown: document.getElementById('pomo-countdown'),
   tabButtons: document.querySelectorAll('.tab-btn'),
-  enginePills: document.querySelectorAll('.engine-pill')
+  enginePills: document.querySelectorAll('.engine-pill'),
+  playerArena: document.getElementById('player-arena'),
+  btnBackToFeed: document.getElementById('btn-back-to-feed'),
+  btnBackHomeSearch: document.getElementById('btn-back-home-search'),
+  gridAll: document.getElementById('grid-all'),
+  gridRecommendations: document.getElementById('grid-recommendations'),
+  tabBtnAll: document.getElementById('tab-btn-all')
 };
 
 // ==========================================
@@ -409,20 +415,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSavedGrid();
   renderAllNotesGrid();
 
-  // If URL has ?v= param, auto play it
+  // If URL has ?v= param, auto play it in Watch Page Mode!
   const urlParams = new URLSearchParams(window.location.search);
   const paramVideo = urlParams.get('v') || urlParams.get('id');
   if (paramVideo) {
     const extracted = extractYouTubeId(paramVideo);
     if (extracted) {
-      loadVideo(extracted, false);
+      loadVideo(extracted, true);
       return;
     }
   }
 
-  // YouTube Style: Fresh dynamic video recommendation on every visit/refresh
-  const initial = getDynamicInitialVideo();
-  loadVideo(initial.id, false, initial.title, initial.channel, initial.thumb);
+  // If URL has search query ?q=
+  const paramQuery = urlParams.get('q') || urlParams.get('search');
+  if (paramQuery) {
+    if (DOM.videoInput) DOM.videoInput.value = paramQuery;
+    handleSearch(paramQuery);
+    return;
+  }
+
+  // YouTube Homepage Style: By default, keep player closed and show All feed!
+  if (DOM.playerArena) DOM.playerArena.style.display = 'none';
+  switchTab('all');
 });
 
 // ==========================================
@@ -623,8 +637,35 @@ function updateWakeBadge(isActive) {
   }
 }
 
+function closePlayerAndBackToFeed() {
+  if (DOM.playerArena) DOM.playerArena.style.display = 'none';
+  const iframe = document.getElementById('pure-iframe');
+  if (iframe) iframe.src = 'about:blank';
+  if (AppState.playbackTimer) clearInterval(AppState.playbackTimer);
+
+  try {
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.delete('v');
+    newUrl.searchParams.delete('id');
+    window.history.replaceState({}, '', newUrl);
+  } catch (e) {}
+
+  // If there are search results, keep search tab active; otherwise go to 'all'
+  if (DOM.gridSearch && DOM.gridSearch.children.length > 0 && DOM.tabBtnSearch && DOM.tabBtnSearch.style.display !== 'none') {
+    switchTab('search');
+  } else {
+    switchTab('all');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, customChannel = null, customThumb = null) {
   if (!videoId) return;
+
+  // Make watch page player visible
+  if (DOM.playerArena) {
+    DOM.playerArena.style.display = 'block';
+  }
 
   AppState.currentVideoId = videoId;
   if (customTitle) AppState.currentTitle = customTitle;
@@ -657,6 +698,9 @@ async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, 
   // Mount player immediately
   mountPlayer(videoId, AppState.targetResumeSeconds);
 
+  // Render recommendations under the player
+  renderRecommendations(videoId);
+
   // Fetch live video metadata asynchronously to refine if missing
   fetchVideoMetadata(videoId);
 
@@ -670,7 +714,7 @@ async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, 
   addToHistory(videoId, customTitle, customChannel, customThumb);
 
   if (triggerAutoScroll && DOM.playerWrapper) {
-    DOM.playerWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    DOM.playerWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   showToast('▶️ Video Loading in Ad-Free High Quality Mode', 'success');
@@ -764,19 +808,22 @@ async function handleSearch(query) {
     return;
   }
 
+  // Hide player arena so search results appear prominently at the very top!
+  if (DOM.playerArena) DOM.playerArena.style.display = 'none';
+  const iframe = document.getElementById('pure-iframe');
+  if (iframe) iframe.src = 'about:blank';
+  if (AppState.playbackTimer) clearInterval(AppState.playbackTimer);
+
   // Otherwise, perform direct search!
-  const longOnly = DOM.checkLongOnly ? DOM.checkLongOnly.checked : true;
+  const longOnly = DOM.checkLongOnly ? DOM.checkLongOnly.checked : false;
   DOM.tabBtnSearch.style.display = 'inline-flex';
   switchTab('search');
   DOM.searchPaneHeading.textContent = `Live YouTube Results for: "${q}" ${longOnly ? '(Long Videos & Marathons)' : ''}`;
   DOM.searchLoadingIndicator.style.display = 'flex';
   DOM.gridSearch.innerHTML = '';
 
-  // Auto-scroll down smoothly so user immediately sees results on mobile!
-  const paneSearch = document.getElementById('pane-search');
-  if (paneSearch) {
-    paneSearch.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // Scroll to top smoothly so user immediately sees search results list!
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   try {
     // 1. Try local or Vercel server API
@@ -1548,6 +1595,15 @@ function createVideoCardElement(video) {
 }
 
 function initCuratedGrids() {
+  const allContainer = document.getElementById('grid-all');
+  if (allContainer) {
+    allContainer.innerHTML = '';
+    const allList = getAllCuratedVideos();
+    allList.forEach(item => {
+      allContainer.appendChild(createVideoCardElement(item));
+    });
+  }
+
   ['study', 'coding', 'songs', 'lofi', 'upsc'].forEach(category => {
     const container = document.getElementById(`grid-${category}`);
     if (container && CURATED_VIDEOS[category]) {
@@ -1556,6 +1612,19 @@ function initCuratedGrids() {
         container.appendChild(createVideoCardElement(item));
       });
     }
+  });
+
+  renderRecommendations();
+}
+
+function renderRecommendations(currentId = null) {
+  const container = document.getElementById('grid-recommendations');
+  if (!container) return;
+  container.innerHTML = '';
+  const allList = getAllCuratedVideos().filter(v => v.id !== currentId);
+  const picked = allList.slice(0, 8);
+  picked.forEach(item => {
+    container.appendChild(createVideoCardElement(item));
   });
 }
 
@@ -1704,8 +1773,28 @@ function initMobileBottomNav() {
 // ==========================================
 function initEventListeners() {
   const btnHome = document.getElementById('btn-home');
-  if (btnHome) {
-    btnHome.addEventListener('click', () => {
+  const brandLogo = document.querySelector('.brand-logo');
+  const navigateToHomeFeed = () => {
+    closePlayerAndBackToFeed();
+    switchTab('all');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (btnHome) btnHome.addEventListener('click', navigateToHomeFeed);
+  if (brandLogo) brandLogo.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateToHomeFeed();
+  });
+
+  // Watch View Back to Feed Button
+  if (DOM.btnBackToFeed) {
+    DOM.btnBackToFeed.addEventListener('click', closePlayerAndBackToFeed);
+  }
+
+  // Back to Home from Search Results
+  if (DOM.btnBackHomeSearch) {
+    DOM.btnBackHomeSearch.addEventListener('click', () => {
+      switchTab('all');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
@@ -1909,6 +1998,9 @@ function handleGlobalKeydown(e) {
 
     case 'escape':
       document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+      if (DOM.playerArena && DOM.playerArena.style.display !== 'none') {
+        closePlayerAndBackToFeed();
+      }
       if (AppState.theaterMode) toggleTheaterMode();
       break;
   }
