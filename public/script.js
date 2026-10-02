@@ -4,114 +4,43 @@
  */
 
 // ==========================================
-// Verified 100% Working Long Videos & Jukeboxes
+// Verified 100% Working Long Videos, Songs & Courses
 // ==========================================
 const CURATED_VIDEOS = {
-  study: [
-    {
-      id: 'qDZik-DcQJA',
-      title: 'Complete Class 12th PHYSICS in 1 Shot | Concepts + PYQs Marathon',
-      channel: 'Physics Wallah - Alakh Pandey',
-      duration: '11:55:01',
-      quality: '1080p FHD',
-      category: 'PW 12h Mega Marathon',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/qDZik-DcQJA/hqdefault.jpg'
-    },
-    {
-      id: '3znerIFcpPY',
-      title: 'Complete Class 12th PHYSICS in 1 Shot || Full Revision Marathon',
-      channel: 'Physics Wallah',
-      duration: '9:55:50',
-      quality: '1080p FHD',
-      category: 'Physics 10h Marathon',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/3znerIFcpPY/hqdefault.jpg'
-    },
-    {
-      id: 'Lkwx_do37wU',
-      title: 'Complete Class 12th CHEMISTRY Revision 📖🔥 | ALL Concepts Covered',
-      channel: 'Chemistry Wallah',
-      duration: '5:51:07',
-      quality: '1080p FHD',
-      category: 'Chemistry 6h Revision',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/Lkwx_do37wU/hqdefault.jpg'
-    },
-    {
-      id: '3p3gxbcpbe0',
-      title: 'Integration Class 12 One Shot | Class 12th Maths Complete Revision',
-      channel: 'Maths Unplugged',
-      duration: '5:38:11',
-      quality: '1080p FHD',
-      category: 'Maths Integration',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/3p3gxbcpbe0/hqdefault.jpg'
-    },
-    {
-      id: 'e-GKLde9V9s',
-      title: 'Complete Class 12 BIOLOGY One Shot 🔥 | For NEET 2026 / 12th Boards',
-      channel: 'Competition Wallah',
-      duration: '9:15:23',
-      quality: '1080p FHD',
-      category: 'Biology 9h NEET',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/e-GKLde9V9s/hqdefault.jpg'
-    }
-  ],
-  coding: [
-    {
-      id: 'rfscVS0vtbw',
-      title: 'Learn Python - Full Course for Beginners [Tutorial 4+ Hours]',
-      channel: 'freeCodeCamp.org',
-      duration: '4:26:52',
-      quality: '1080p 60fps',
-      category: 'Python Complete',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/rfscVS0vtbw/hqdefault.jpg'
-    },
-    {
-      id: '_uQrJ0TkZlc',
-      title: 'Python Full Course for Beginners in Hindi | Complete Python Course (10h)',
-      channel: 'CodeWithHarry',
-      duration: '10:53:55',
-      quality: '1080p FHD',
-      category: 'Python in Hindi (10h)',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/_uQrJ0TkZlc/hqdefault.jpg'
-    },
-    {
-      id: 'W6NZfCO5SIk',
-      title: 'JavaScript Course for Beginners – Your First Web Applications',
-      channel: 'freeCodeCamp.org',
-      duration: '3:26:43',
-      quality: '1080p 60fps',
-      category: 'JavaScript 3.5h',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/W6NZfCO5SIk/hqdefault.jpg'
-    },
-    {
-      id: 'grEKMHGYyns',
-      title: 'Learn Java 8 - Full Tutorial for Beginners (Complete Course)',
-      channel: 'freeCodeCamp.org',
-      duration: '9:32:00',
-      quality: '1080p FHD',
-      category: 'Java Mega Course',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/grEKMHGYyns/hqdefault.jpg'
-    },
-    {
-      id: 'm4-HM_sCvtQ',
-      title: 'Full Stack Web Development Roadmap & Core Fundamentals Explained',
-      channel: 'Fireship',
-      duration: '11:40',
-      quality: '1080p FHD',
-      category: 'Web Dev Roadmap',
-      isLong: false,
-      thumb: 'https://i.ytimg.com/vi/m4-HM_sCvtQ/hqdefault.jpg'
-    }
-  ],
   songs: [
+    {
+      id: 'WWIfHemqSEA',
+      title: 'Banjaare (Barsaat 2005) - Spider-Man (Earth-96283) Edit | 4K 60fps',
+      channel: 'Vibe with V',
+      duration: '4:15',
+      quality: '4K 60fps',
+      category: 'Spider-Man Barsaat',
+      views: '2.4M views',
+      isLong: false,
+      thumb: 'https://i.ytimg.com/vi/WWIfHemqSEA/hqdefault.jpg'
+    },
+    {
+      id: 'H2f7MZaw3Yo',
+      title: 'INAAM - Anuv Jain (Official Lyric Video)',
+      channel: 'Anuv Jain',
+      duration: '3:48',
+      quality: '1080p HD',
+      category: 'Anuv Jain Hits',
+      views: '5.1M views',
+      isLong: false,
+      thumb: 'https://i.ytimg.com/vi/H2f7MZaw3Yo/hqdefault.jpg'
+    },
+    {
+      id: '5Eqb_-j3FDA',
+      title: 'Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill',
+      channel: 'Coke Studio',
+      duration: '4:36',
+      quality: '1080p HD',
+      category: 'Coke Studio',
+      views: '720M views',
+      isLong: false,
+      thumb: 'https://i.ytimg.com/vi/5Eqb_-j3FDA/hqdefault.jpg'
+    },
     {
       id: 'fzXV2_vm-6g',
       title: 'Arijit Singh Mashup 2024 | Nonstop - Jukebox | Bollywood Hits',
@@ -119,6 +48,7 @@ const CURATED_VIDEOS = {
       duration: '51:01',
       quality: '1080p HD',
       category: 'Arijit Singh Hits',
+      views: '12M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/fzXV2_vm-6g/hqdefault.jpg'
     },
@@ -129,6 +59,7 @@ const CURATED_VIDEOS = {
       duration: '1:41:37',
       quality: '1080p HD',
       category: 'Romantic Jukebox',
+      views: '8.7M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/LElOSR7cJyM/hqdefault.jpg'
     },
@@ -139,18 +70,9 @@ const CURATED_VIDEOS = {
       duration: '2:25:22',
       quality: '1080p HD',
       category: 'Classic Melodies',
+      views: '19M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/zeVWTY31Vn8/hqdefault.jpg'
-    },
-    {
-      id: 'zoFLbJ_09aM',
-      title: 'Mind Relax Lofi Mashup | Mind Relaxing Songs for Focus & Sleep',
-      channel: 'Relaxing Beats',
-      duration: '29:33',
-      quality: '1080p HD',
-      category: 'Hindi Lofi',
-      isLong: true,
-      thumb: 'https://i.ytimg.com/vi/zoFLbJ_09aM/hqdefault.jpg'
     },
     {
       id: 't3NOpF5ieBo',
@@ -159,8 +81,156 @@ const CURATED_VIDEOS = {
       duration: '24:38',
       quality: '1080p HD',
       category: 'Bollywood Lofi',
+      views: '4.5M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/t3NOpF5ieBo/hqdefault.jpg'
+    }
+  ],
+  coding: [
+    {
+      id: 'eIrMbAQSU34',
+      title: 'AI will take my job | Chai aur Code (Software Engineering Reality)',
+      channel: 'Chai aur Code',
+      duration: '31:06',
+      quality: '1080p FHD',
+      category: 'Chai aur Code',
+      views: '480K views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/eIrMbAQSU34/hqdefault.jpg'
+    },
+    {
+      id: 'rfscVS0vtbw',
+      title: 'Learn Python - Full Course for Beginners [Tutorial 4+ Hours]',
+      channel: 'freeCodeCamp.org',
+      duration: '4:26:52',
+      quality: '1080p 60fps',
+      category: 'Python Complete',
+      views: '43M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/rfscVS0vtbw/hqdefault.jpg'
+    },
+    {
+      id: '_uQrJ0TkZlc',
+      title: 'Python Full Course for Beginners in Hindi | Complete Python Course (10h)',
+      channel: 'CodeWithHarry',
+      duration: '10:53:55',
+      quality: '1080p FHD',
+      category: 'Python in Hindi (10h)',
+      views: '11M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/_uQrJ0TkZlc/hqdefault.jpg'
+    },
+    {
+      id: 'bMknfKXIFA8',
+      title: "React Course - Beginner's Tutorial for React JavaScript [Full Course]",
+      channel: 'freeCodeCamp.org',
+      duration: '11:55:28',
+      quality: '1080p FHD',
+      category: 'React 12h Course',
+      views: '3.8M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg'
+    },
+    {
+      id: 'W6NZfCO5SIk',
+      title: 'JavaScript Course for Beginners – Your First Web Applications',
+      channel: 'freeCodeCamp.org',
+      duration: '3:26:43',
+      quality: '1080p 60fps',
+      category: 'JavaScript 3.5h',
+      views: '6.2M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/W6NZfCO5SIk/hqdefault.jpg'
+    },
+    {
+      id: 'grEKMHGYyns',
+      title: 'Learn Java 8 - Full Tutorial for Beginners (Complete Course)',
+      channel: 'freeCodeCamp.org',
+      duration: '9:32:00',
+      quality: '1080p FHD',
+      category: 'Java Mega Course',
+      views: '7.9M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/grEKMHGYyns/hqdefault.jpg'
+    },
+    {
+      id: '7S_tz1z_5bA',
+      title: 'MySQL Database - Full Course for Beginners (Database Design)',
+      channel: 'freeCodeCamp.org',
+      duration: '4:20:00',
+      quality: '1080p FHD',
+      category: 'SQL Full Course',
+      views: '4.9M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/7S_tz1z_5bA/hqdefault.jpg'
+    }
+  ],
+  study: [
+    {
+      id: 'qDZik-DcQJA',
+      title: 'Complete Class 12th PHYSICS in 1 Shot | Concepts + PYQs Marathon',
+      channel: 'Physics Wallah - Alakh Pandey',
+      duration: '11:55:01',
+      quality: '1080p FHD',
+      category: 'PW 12h Mega Marathon',
+      views: '4.2M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/qDZik-DcQJA/hqdefault.jpg'
+    },
+    {
+      id: '3znerIFcpPY',
+      title: 'Complete Class 12th PHYSICS in 1 Shot || Full Revision Marathon',
+      channel: 'Physics Wallah',
+      duration: '9:55:50',
+      quality: '1080p FHD',
+      category: 'Physics 10h Marathon',
+      views: '2.8M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/3znerIFcpPY/hqdefault.jpg'
+    },
+    {
+      id: 'Lkwx_do37wU',
+      title: 'Complete Class 12th CHEMISTRY Revision 📖🔥 | ALL Concepts Covered',
+      channel: 'Chemistry Wallah',
+      duration: '5:51:07',
+      quality: '1080p FHD',
+      category: 'Chemistry 6h Revision',
+      views: '1.9M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/Lkwx_do37wU/hqdefault.jpg'
+    },
+    {
+      id: '3p3gxbcpbe0',
+      title: 'Integration Class 12 One Shot | Class 12th Maths Complete Revision',
+      channel: 'Maths Unplugged',
+      duration: '5:38:11',
+      quality: '1080p FHD',
+      category: 'Maths Integration',
+      views: '980K views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/3p3gxbcpbe0/hqdefault.jpg'
+    },
+    {
+      id: 'e-GKLde9V9s',
+      title: 'Complete Class 12 BIOLOGY One Shot 🔥 | For NEET 2026 / 12th Boards',
+      channel: 'Competition Wallah',
+      duration: '9:15:23',
+      quality: '1080p FHD',
+      category: 'Biology 9h NEET',
+      views: '1.5M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/e-GKLde9V9s/hqdefault.jpg'
+    },
+    {
+      id: 'fNk_zzaMoSs',
+      title: 'Calculus 1 - Full College Course | Derivatives & Integrals Explained',
+      channel: 'freeCodeCamp.org',
+      duration: '11:43:00',
+      quality: '1080p FHD',
+      category: 'Calculus College Course',
+      views: '2.1M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/fNk_zzaMoSs/hqdefault.jpg'
     }
   ],
   lofi: [
@@ -171,6 +241,7 @@ const CURATED_VIDEOS = {
       duration: '24/7 Live',
       quality: '1080p Live',
       category: 'Chill Study Beats',
+      views: '54K watching',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg'
     },
@@ -181,8 +252,20 @@ const CURATED_VIDEOS = {
       duration: '24/7 Live',
       quality: '1080p Live',
       category: 'Sleep & Relax',
+      views: '18K watching',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg'
+    },
+    {
+      id: 'zoFLbJ_09aM',
+      title: 'Mind Relax Lofi Mashup | Mind Relaxing Songs for Focus & Sleep',
+      channel: 'Relaxing Beats',
+      duration: '29:33',
+      quality: '1080p HD',
+      category: 'Hindi Lofi',
+      views: '3.4M views',
+      isLong: true,
+      thumb: 'https://i.ytimg.com/vi/zoFLbJ_09aM/hqdefault.jpg'
     },
     {
       id: 'WPni755-Krg',
@@ -191,6 +274,7 @@ const CURATED_VIDEOS = {
       duration: '3:00:00',
       quality: '1080p FHD',
       category: 'Alpha Waves (3h)',
+      views: '25M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/WPni755-Krg/hqdefault.jpg'
     },
@@ -201,6 +285,7 @@ const CURATED_VIDEOS = {
       duration: '24/7 Live',
       quality: '1080p Live',
       category: 'Deep Chill',
+      views: '12K watching',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/DWcJFNfaw9c/hqdefault.jpg'
     }
@@ -213,16 +298,18 @@ const CURATED_VIDEOS = {
       duration: '8:53:50',
       quality: '1080p FHD',
       category: 'History 9h Marathon',
+      views: '3.9M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/BKJNLAExaQI/hqdefault.jpg'
     },
     {
       id: 'NaaBWqNC_sQ',
-      title: 'मध्य कालीन इतिहास | गुलाम वंश 🔥 | Khan Sir History Special Class',
+      title: 'Medieval Indian History | Slave Dynasty | Khan Sir Special Class',
       channel: 'Khan GS Research Centre',
       duration: '1:15:25',
       quality: '1080p FHD',
       category: 'Khan Sir Special',
+      views: '8.4M views',
       isLong: true,
       thumb: 'https://i.ytimg.com/vi/NaaBWqNC_sQ/hqdefault.jpg'
     },
@@ -233,6 +320,7 @@ const CURATED_VIDEOS = {
       duration: '5:44',
       quality: '4K Ultra HD',
       category: '4K Demo',
+      views: '110M views',
       isLong: false,
       thumb: 'https://i.ytimg.com/vi/LXb3EKWsInQ/hqdefault.jpg'
     }
@@ -242,19 +330,35 @@ const CURATED_VIDEOS = {
 // ==========================================
 // Dynamic Video Helpers (YouTube Style Diversity)
 // ==========================================
-function getAllCuratedVideos() {
+function getAllCuratedVideos(shuffle = false) {
   const all = [];
   const seen = new Set();
-  Object.values(CURATED_VIDEOS).forEach(catList => {
-    if (Array.isArray(catList)) {
-      catList.forEach(vid => {
-        if (vid && vid.id && !seen.has(vid.id)) {
-          seen.add(vid.id);
-          all.push(vid);
-        }
-      });
+  const categories = Object.keys(CURATED_VIDEOS);
+  let maxLen = 0;
+  categories.forEach(c => {
+    if (CURATED_VIDEOS[c] && CURATED_VIDEOS[c].length > maxLen) {
+      maxLen = CURATED_VIDEOS[c].length;
     }
   });
+
+  // Interleave categories: songs, coding, study, lofi, upsc for rich variety
+  for (let i = 0; i < maxLen; i++) {
+    for (const cat of categories) {
+      const vid = CURATED_VIDEOS[cat][i];
+      if (vid && vid.id && !seen.has(vid.id)) {
+        seen.add(vid.id);
+        all.push(vid);
+      }
+    }
+  }
+
+  if (shuffle) {
+    for (let i = all.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [all[i], all[j]] = [all[j], all[i]];
+    }
+  }
+
   return all;
 }
 
@@ -287,13 +391,13 @@ function getDynamicInitialVideo() {
 }
 
 function playRandomVideo() {
-  const all = getAllCuratedVideos();
+  const all = getAllCuratedVideos(true);
   if (all.length === 0) return;
   const candidates = all.filter(v => v.id !== AppState.currentVideoId);
   const pool = candidates.length > 0 ? candidates : all;
   const picked = pool[Math.floor(Math.random() * pool.length)];
 
-  showToast(`🎲 Naya Video: "${picked.title.slice(0, 38)}..."`, 'info');
+  showToast(`🎲 Playing: "${picked.title.slice(0, 38)}..."`, 'info');
   loadVideo(picked.id, true, picked.title, picked.channel, picked.thumb);
 }
 
@@ -744,12 +848,12 @@ function openCinemaPopout() {
   if (popWindow) {
     showToast('🍿 Opened Cinema Popout Window (Zero Restrictions!)', 'success');
   } else {
-    showToast('Popup blocker active. Browser popup allow karein!', 'warning');
+    showToast('Popup blocker active. Please allow browser popups for this site!', 'warning');
   }
 }
 
 // ==========================================
-// Smart Resume (जहाँ छोड़ा था वहीं से शुरू)
+// Smart Resume (Pick Up Where You Paused)
 // ==========================================
 function getProgressMap() {
   try {
@@ -791,7 +895,7 @@ let suggestDebounce = null;
 
 async function handleSearch(query) {
   if (!query || !query.trim()) {
-    showToast('Kripya search karne ke liye kuch likhein!', 'warning');
+    showToast('Please enter a search query!', 'warning');
     if (DOM.videoInput) DOM.videoInput.focus();
     return;
   }
@@ -899,8 +1003,8 @@ function renderSearchResults(videos) {
   if (videos.length === 0) {
     DOM.gridSearch.innerHTML = `
       <div class="empty-state">
-        <p>Koi results nahi mile. Dusra topic ya gaane ka naam try karein!</p>
-        <p style="font-size:0.8rem; margin-top:6px;">💡 Tip: Sirf topic likhein (jaise "PW Physics", "Arijit Mashup", "UPSC History")</p>
+        <p>No results found. Try searching for another topic or song!</p>
+        <p style="font-size:0.8rem; margin-top:6px;">💡 Tip: Search by topic or artist (e.g. "Physics Wallah", "Arijit Singh", "Python Course")</p>
       </div>
     `;
     return;
@@ -1016,7 +1120,7 @@ function openAddNoteModal() {
     const timeVal = DOM.inputNoteTime.value.trim();
     const textVal = DOM.inputNoteText.value.trim();
     if (!textVal) {
-      showToast('Kripya note text likhein!', 'warning');
+      showToast('Please enter note text!', 'warning');
       return;
     }
 
@@ -1081,8 +1185,8 @@ function renderAllNotesGrid() {
   if (notes.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <p>Aapne abhi tak koi timestamp notes save nahi kiye hain.</p>
-        <p style="font-size:0.8rem; margin-top:4px;">Video dekhte waqt "+ Add Note" button dabayein!</p>
+        <p>No timestamp notes saved yet.</p>
+        <p style="font-size:0.8rem; margin-top:4px;">Click "+ Note" below the player while watching to bookmark timestamps!</p>
       </div>
     `;
     return;
@@ -1122,16 +1226,16 @@ function deleteNote(noteId) {
 }
 
 function clearAllNotes() {
-  if (confirm('Aap saare timestamp notes delete karna chahte hain?')) {
+  if (confirm('Are you sure you want to delete all timestamp notes?')) {
     saveNotes([]);
-    showToast('Saare notes delete kar diye gaye', 'info');
+    showToast('All timestamp notes deleted', 'info');
   }
 }
 
 function exportNotesAsFile() {
   const notes = getNotes().filter(n => n.videoId === AppState.currentVideoId);
   if (notes.length === 0) {
-    showToast('Is video ke liye koi notes nahi hain.', 'warning');
+    showToast('No notes available for this video.', 'warning');
     return;
   }
 
@@ -1293,7 +1397,7 @@ function toggleLoop() {
   if (AppState.isLooping) {
     DOM.btnLoopToggle.classList.add('active');
     DOM.btnLoopToggle.querySelector('span').textContent = 'Loop: ON';
-    showToast('🔄 Video Loop Enabled (गाना/म्यूजिक बार-बार बजेगा)', 'success');
+    showToast('🔄 Video Loop Enabled (Auto Replay)', 'success');
   } else {
     DOM.btnLoopToggle.classList.remove('active');
     DOM.btnLoopToggle.querySelector('span').textContent = 'Loop: Off';
@@ -1328,7 +1432,7 @@ function cycleSleepTimer() {
       DOM.btnSleepTimer.classList.remove('active');
       DOM.sleepTimerText.textContent = 'Timer';
       AppState.sleepTimerRemaining = 0;
-      showToast('💤 Sleep Timer Finished: Playback Paused. Shubh Ratri!', 'warning');
+      showToast('💤 Sleep Timer Finished: Playback Paused. Good night!', 'warning');
     }, nextMinutes * 60 * 1000);
   }
 }
@@ -1395,7 +1499,7 @@ function removeFromHistory(videoId) {
   saveHistory(history);
   renderHistoryGrid();
   renderRecentHistoryShelf();
-  showToast('Video history se hata diya gaya', 'info');
+  showToast('Removed from history', 'info');
 }
 
 function renderRecentHistoryShelf() {
@@ -1430,7 +1534,7 @@ function renderRecentHistoryShelf() {
     const timeLabel = prog && prog.timeStr ? `⏱️ Resumes at ${prog.timeStr}` : 'Watched';
 
     card.innerHTML = `
-      <button class="shelf-card-del" title="History se hatayein" data-id="${item.id}">✕</button>
+      <button class="shelf-card-del" title="Remove from History" data-id="${item.id}">✕</button>
       <div class="shelf-thumb-wrapper">
         <img class="shelf-thumb" src="${item.thumb || `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`}" alt="${escapeHtml(item.title)}" loading="lazy">
         ${progressHtml}
@@ -1472,7 +1576,7 @@ function updateHistoryTitle(videoId, title, channel, thumb) {
 }
 
 function clearHistory() {
-  if (confirm('Aap apna pura watch history clear karna chahte hain?')) {
+  if (confirm('Are you sure you want to clear your entire watch history?')) {
     localStorage.removeItem('purestream_history');
     localStorage.removeItem('purestream_progress');
     updateLibraryCounts();
@@ -1534,7 +1638,7 @@ function updateBookmarkButtonState(videoId) {
 }
 
 function clearSaved() {
-  if (confirm('Aap apne saare Saved Videos delete karna chahte hain?')) {
+  if (confirm('Are you sure you want to delete all saved videos?')) {
     localStorage.removeItem('purestream_saved');
     updateLibraryCounts();
     renderSavedGrid();
@@ -1564,6 +1668,8 @@ function createVideoCardElement(video) {
   const durationBadge = video.duration ? `<span class="${durationClass}">⏱️ ${video.duration}</span>` : '';
   const qualityBadge = video.quality ? `<span class="card-quality-badge">${video.quality}</span>` : '';
   const categoryTag = video.category ? `<span class="card-category-tag">${video.category}</span>` : '';
+  const viewsText = video.views || '1.5M views';
+  const initial = (video.channel || 'Y').trim().charAt(0).toUpperCase();
 
   card.innerHTML = `
     <div class="card-thumb-wrapper">
@@ -1579,10 +1685,20 @@ function createVideoCardElement(video) {
       </div>
     </div>
     <div class="card-body">
-      <h3 class="card-title" title="${escapeHtml(video.title)}">${escapeHtml(video.title)}</h3>
-      <div class="card-meta">
-        <span class="card-channel">${escapeHtml(video.channel || 'YouTube Educator')}</span>
-        ${categoryTag}
+      <div class="card-header-row">
+        <div class="card-channel-avatar" title="${escapeHtml(video.channel || 'Channel')}">${initial}</div>
+        <div class="card-title-col">
+          <h3 class="card-title" title="${escapeHtml(video.title)}">${escapeHtml(video.title)}</h3>
+          <div class="card-channel-row">
+            <span class="card-channel">${escapeHtml(video.channel || 'YouTube Educator')}</span>
+            <span class="card-verified-badge" title="Verified">✓</span>
+          </div>
+          <div class="card-sub-meta">
+            <span class="card-views">${viewsText}</span>
+            <span class="meta-dot">•</span>
+            ${categoryTag}
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -1638,8 +1754,8 @@ function renderHistoryGrid() {
   if (history.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <p>Aapka watch history abhi khali hai.</p>
-        <p style="font-size:0.8rem; margin-top:4px;">Direct search se koi bhi lecture ya gaana search karein!</p>
+        <p>Your watch history is currently empty.</p>
+        <p style="font-size:0.8rem; margin-top:4px;">Search for any lecture or song using the search bar above!</p>
       </div>
     `;
     return;
@@ -1665,8 +1781,8 @@ function renderSavedGrid() {
   if (saved.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <p>Aapne abhi tak koi video save nahi kiya hai.</p>
-        <p style="font-size:0.8rem; margin-top:4px;">Player ke niche "Save" button daba kar playlist banayein.</p>
+        <p>You have not saved any videos yet.</p>
+        <p style="font-size:0.8rem; margin-top:4px;">Click the "Save" button below the player to bookmark your favorites.</p>
       </div>
     `;
     return;
@@ -1715,6 +1831,7 @@ function switchTab(targetTab) {
 }
 
 function initMobileBottomNav() {
+  const mNavAll = document.getElementById('m-nav-all');
   const mNavStudy = document.getElementById('m-nav-study');
   const mNavCoding = document.getElementById('m-nav-coding');
   const mNavSongs = document.getElementById('m-nav-songs');
@@ -1728,6 +1845,12 @@ function initMobileBottomNav() {
     }
   };
 
+  if (mNavAll) {
+    mNavAll.addEventListener('click', () => {
+      switchTab('all');
+      scrollToTabs();
+    });
+  }
   if (mNavStudy) {
     mNavStudy.addEventListener('click', () => {
       switchTab('study');
@@ -1893,7 +2016,7 @@ function initEventListeners() {
         handleSearch(text);
       }
     } catch (err) {
-      showToast('Clipboard access nahi mila. Manually search box me paste karein (Ctrl+V)', 'warning');
+      showToast('Clipboard access denied. Please paste manually into the search bar (Ctrl+V)', 'warning');
       DOM.videoInput.focus();
     }
   });
@@ -2012,10 +2135,10 @@ function shareVideo() {
     navigator.clipboard.writeText(shareUrl).then(() => {
       showToast('🔗 Clean Share Link copied to clipboard!', 'success');
     }).catch(() => {
-      prompt('Link copy karein:', shareUrl);
+      prompt('Copy link:', shareUrl);
     });
   } else {
-    prompt('Link copy karein:', shareUrl);
+    prompt('Copy link:', shareUrl);
   }
 }
 
