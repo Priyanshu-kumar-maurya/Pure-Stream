@@ -869,40 +869,106 @@ body.ambient-off .player-ambient-ring {
   color: #fff;
 }
 
-/* Audio Focus Overlay */
+/* ==========================================
+   True OLED Screen-Off Pocket Mode Overlay
+   (0% Pixel Power, Anti-Pocket Touch, Continuous Audio)
+   ========================================== */
 .audio-focus-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(7, 8, 10, 0.96);
-  z-index: 5;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-color: #000000 !important; /* Pure OLED Black - physical diodes turn off */
+  color: #7b8295;
+  z-index: 999999;
   display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-  border-radius: var(--radius-md);
+  padding: clamp(1.2rem, 4vh, 2.5rem) 1.5rem clamp(1.5rem, 5vh, 3rem);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overflow: hidden;
 }
 
-.audio-visualizer {
+.oled-top-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.35rem;
+  opacity: 0.7;
+}
+
+.oled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 0.5rem;
+}
+
+.oled-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+  animation: pulseWake 2s infinite ease-in-out;
+}
+
+.oled-clock {
+  font-size: clamp(2.6rem, 9vw, 4.8rem);
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: #d1d5db;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+  line-height: 1;
+}
+
+.oled-ampm {
+  font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.oled-date {
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  color: #4b5563;
+  margin-top: 2px;
+}
+
+.oled-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  max-width: 90%;
 }
 
 .sound-wave {
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 50px;
+  height: 48px;
 }
 
 .sound-wave span {
-  width: 6px;
-  background: var(--accent-cyan);
+  width: 5px;
+  background: #00e5ff;
   border-radius: 4px;
   animation: soundBounce 1.2s infinite ease-in-out;
 }
@@ -916,8 +982,128 @@ body.ambient-off .player-ambient-ring {
 .sound-wave span:nth-child(7) { height: 25%; animation-delay: 0.7s; }
 
 @keyframes soundBounce {
-  0%, 100% { transform: scaleY(0.4); }
+  0%, 100% { transform: scaleY(0.35); }
   50% { transform: scaleY(1); }
+}
+
+.oled-track-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.oled-title {
+  font-size: clamp(1rem, 3.5vw, 1.35rem);
+  font-weight: 600;
+  color: #e5e7eb;
+  line-height: 1.35;
+  max-width: 480px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.oled-channel {
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  color: #9ca3af;
+}
+
+.pocket-lock-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.oled-bottom-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.oled-media-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.oled-ctrl-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.72rem;
+  font-weight: 600;
+  gap: 2px;
+  touch-action: manipulation;
+}
+
+.oled-ctrl-btn:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.oled-ctrl-btn.main-play {
+  width: 66px;
+  height: 66px;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.2);
+}
+
+.oled-ctrl-btn.main-play:active {
+  transform: scale(0.9);
+  background: #e5e7eb;
+}
+
+.oled-wake-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f3f4f6;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+.oled-wake-btn:active {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.98);
+}
+
+.oled-tip {
+  font-size: 0.75rem;
+  color: #4b5563;
+  letter-spacing: 0.3px;
 }
 
 /* Player Command Bar */

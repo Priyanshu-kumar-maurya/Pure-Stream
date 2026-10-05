@@ -415,6 +415,8 @@ const AppState = {
   ambientGlow: true,
   theaterMode: false,
   audioMode: false,
+  isPlaying: false,
+  isUserPaused: false,
   engine: 'nocookie', // 'nocookie', 'youtube', 'yewtu', 'piped'
   targetResumeSeconds: 0,
   currentPlaybackSeconds: 0,
@@ -446,12 +448,22 @@ const DOM = {
   screenWakeBadge: document.getElementById('screen-wake-badge'),
   wakeBadgeText: document.getElementById('wake-badge-text'),
   wakeLockHeartbeat: document.getElementById('wake-lock-heartbeat'),
+  bgAudioAnchor: document.getElementById('bg-audio-anchor'),
   resumeBanner: document.getElementById('resume-banner'),
   resumeTimeStr: document.getElementById('resume-time-str'),
   btnResumeAccept: document.getElementById('btn-resume-accept'),
   btnResumeDismiss: document.getElementById('btn-resume-dismiss'),
   audioFocusOverlay: document.getElementById('audio-focus-overlay'),
   btnExitAudioMode: document.getElementById('btn-exit-audio-mode'),
+  btnPlayerScreenOff: document.getElementById('btn-player-screen-off'),
+  oledClock: document.getElementById('oled-clock'),
+  oledDate: document.getElementById('oled-date'),
+  oledVideoTitle: document.getElementById('oled-video-title'),
+  oledChannelName: document.getElementById('oled-channel-name'),
+  btnOledRewind: document.getElementById('btn-oled-rewind'),
+  btnOledPlayPause: document.getElementById('btn-oled-playpause'),
+  btnOledForward: document.getElementById('btn-oled-forward'),
+  oledPlayIcon: document.getElementById('oled-play-icon'),
   ambientBackdrop: document.getElementById('ambient-backdrop'),
   ambientRing: document.getElementById('ambient-ring'),
   btnAmbientToggle: document.getElementById('btn-ambient-toggle'),
@@ -673,20 +685,26 @@ function saveCurrentProgress(videoId, seconds) {
   localStorage.setItem('purestream_progress', JSON.stringify(map));
 }
 
-function seekVideo(deltaSeconds) {
-  const newSeconds = Math.max(0, (AppState.currentPlaybackSeconds || 0) + deltaSeconds);
-  AppState.currentPlaybackSeconds = newSeconds;
-
+function sendIframeCommand(func, args = []) {
   const iframe = document.getElementById('pure-iframe');
   if (iframe && iframe.contentWindow) {
     try {
       iframe.contentWindow.postMessage(JSON.stringify({
         event: 'command',
-        func: 'seekTo',
-        args: [newSeconds, true]
+        func: func,
+        args: args
       }), '*');
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Iframe command dispatch failed:', e);
+    }
   }
+}
+
+function seekVideo(deltaSeconds) {
+  const newSeconds = Math.max(0, (AppState.currentPlaybackSeconds || 0) + deltaSeconds);
+  AppState.currentPlaybackSeconds = newSeconds;
+
+  sendIframeCommand('seekTo', [newSeconds, true]);
 
   saveCurrentProgress(AppState.currentVideoId, newSeconds);
   showToast(`${deltaSeconds > 0 ? '⏩ +10s' : '⏪ -10s'} (${formatSecondsToTime(newSeconds)})`, 'info');
@@ -753,6 +771,11 @@ function closePlayerAndBackToFeed() {
   if (iframe) iframe.src = 'about:blank';
   if (AppState.playbackTimer) clearInterval(AppState.playbackTimer);
 
+  stopBackgroundAudioSession();
+  AppState.isPlaying = false;
+  AppState.isUserPaused = true;
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+
   try {
     const newUrl = new URL(window.location);
     newUrl.searchParams.delete('v');
@@ -794,6 +817,13 @@ async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, 
   AppState.currentPlaybackSeconds = AppState.targetResumeSeconds || 0;
   startPlaybackTimer();
   enableScreenWakeLock();
+
+  // Activate continuous background audio & lock screen media controls
+  AppState.isPlaying = true;
+  AppState.isUserPaused = false;
+  startBackgroundAudioSession();
+  updateMediaSession(AppState.currentTitle, AppState.currentChannel, AppState.currentThumb);
+  updateOledTrackInfo();
 
   // Check saved progress for Smart Resume
   checkSmartResume(videoId);
@@ -1344,22 +1374,288 @@ function playChimeSound() {
 }
 
 // ==========================================
-// Audio / Distraction-Free Focus Mode
+// Screen-Off Background Audio & OLED Mode
 // ==========================================
-function toggleAudioMode() {
-  AppState.audioMode = !AppState.audioMode;
-  if (AppState.audioMode) {
-    DOM.audioFocusOverlay.style.display = 'flex';
-    DOM.btnAudioMode.classList.add('active');
-    DOM.btnAudioMode.querySelector('.btn-text').textContent = 'Audio: ON';
-    showToast('🎧 Distraction-Free Audio Mode Active', 'info');
-  } else {
-    DOM.audioFocusOverlay.style.display = 'none';
-    DOM.btnAudioMode.classList.remove('active');
-    DOM.btnAudioMode.querySelector('.btn-text').textContent = 'Focus Mode';
-    showToast('Video screen restored', 'info');
+let cachedSilentBlobUrl = null;
+function createSilentAudioBlobUrl() {
+  if (cachedSilentBlobUrl) return cachedSilentBlobUrl;
+  try {
+    const sampleRate = 8000;
+    const numSamples = sampleRate; // 1 second of silence
+    const buffer = new ArrayBuffer(44 + numSamples);
+    const view = new DataView(buffer);
+    view.setUint32(0, 0x52494646, false); // "RIFF"
+    view.setUint32(4, 36 + numSamples, true);
+    view.setUint32(8, 0x57415645, false); // "WAVE"
+    view.setUint32(12, 0x666d7420, false); // "fmt "
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate, true);
+    view.setUint16(32, 1, true);
+    view.setUint16(34, 8, true);
+    view.setUint32(36, 0x64617461, false); // "data"
+    view.setUint32(40, numSamples, true);
+    const u8 = new Uint8Array(buffer, 44, numSamples);
+    u8.fill(128); // 8-bit PCM silence
+    const blob = new Blob([buffer], { type: 'audio/wav' });
+    cachedSilentBlobUrl = URL.createObjectURL(blob);
+    return cachedSilentBlobUrl;
+  } catch (e) {
+    console.warn('Silent audio generation failed:', e);
+    return '';
   }
 }
+
+function startBackgroundAudioSession() {
+  const audio = DOM.bgAudioAnchor || document.getElementById('bg-audio-anchor');
+  if (audio) {
+    if (!audio.src) {
+      const blobUrl = createSilentAudioBlobUrl();
+      if (blobUrl) audio.src = blobUrl;
+    }
+    audio.play().catch(() => {});
+  }
+  AppState.isPlaying = true;
+  AppState.isUserPaused = false;
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'playing';
+  }
+  updateOledPlayPauseBtn(true);
+}
+
+function stopBackgroundAudioSession() {
+  const audio = DOM.bgAudioAnchor || document.getElementById('bg-audio-anchor');
+  if (audio) {
+    try { audio.pause(); } catch (e) {}
+  }
+  AppState.isPlaying = false;
+  AppState.isUserPaused = true;
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused';
+  }
+  updateOledPlayPauseBtn(false);
+}
+
+function updateMediaSession(title, channel, thumb) {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    const artworkList = [];
+    const validThumb = thumb || AppState.currentThumb || `https://i.ytimg.com/vi/${AppState.currentVideoId}/hqdefault.jpg`;
+    if (validThumb) {
+      artworkList.push(
+        { src: validThumb, sizes: '96x96', type: 'image/jpeg' },
+        { src: validThumb, sizes: '128x128', type: 'image/jpeg' },
+        { src: validThumb, sizes: '192x192', type: 'image/jpeg' },
+        { src: validThumb, sizes: '256x256', type: 'image/jpeg' },
+        { src: validThumb, sizes: '384x384', type: 'image/jpeg' },
+        { src: validThumb, sizes: '512x512', type: 'image/jpeg' }
+      );
+    }
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title || AppState.currentTitle || 'PureStream Music & Study',
+      artist: channel || AppState.currentChannel || 'PureStream YouTube Player',
+      album: 'PureStream Ad-Free Hub',
+      artwork: artworkList
+    });
+
+    navigator.mediaSession.playbackState = AppState.isPlaying ? 'playing' : 'paused';
+
+    const actionHandlers = [
+      ['play', () => {
+        AppState.isPlaying = true;
+        AppState.isUserPaused = false;
+        startBackgroundAudioSession();
+        sendIframeCommand('playVideo');
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+        updateOledPlayPauseBtn(true);
+      }],
+      ['pause', () => {
+        AppState.isPlaying = false;
+        AppState.isUserPaused = true;
+        stopBackgroundAudioSession();
+        sendIframeCommand('pauseVideo');
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        updateOledPlayPauseBtn(false);
+      }],
+      ['seekbackward', (details) => {
+        seekVideo(-(details && details.seekOffset ? details.seekOffset : 10));
+      }],
+      ['seekforward', (details) => {
+        seekVideo(details && details.seekOffset ? details.seekOffset : 10);
+      }],
+      ['previoustrack', () => {
+        seekVideo(-10);
+      }],
+      ['nexttrack', () => {
+        seekVideo(10);
+      }],
+      ['stop', () => {
+        AppState.isPlaying = false;
+        AppState.isUserPaused = true;
+        stopBackgroundAudioSession();
+        sendIframeCommand('pauseVideo');
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+      }]
+    ];
+
+    actionHandlers.forEach(([action, handler]) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch (e) {}
+    });
+  } catch (err) {
+    console.warn('MediaSession registration error:', err);
+  }
+}
+
+function togglePlayPause() {
+  if (AppState.isPlaying) {
+    AppState.isPlaying = false;
+    AppState.isUserPaused = true;
+    stopBackgroundAudioSession();
+    sendIframeCommand('pauseVideo');
+    updateOledPlayPauseBtn(false);
+    showToast('⏸️ Playback Paused', 'info');
+  } else {
+    AppState.isPlaying = true;
+    AppState.isUserPaused = false;
+    startBackgroundAudioSession();
+    sendIframeCommand('playVideo');
+    updateOledPlayPauseBtn(true);
+    showToast('▶️ Playback Resumed', 'success');
+  }
+}
+
+function updateOledPlayPauseBtn(isPlaying) {
+  const icon = DOM.oledPlayIcon || document.getElementById('oled-play-icon');
+  if (icon) {
+    if (isPlaying) {
+      icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    } else {
+      icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    }
+  }
+}
+
+function updateOledTrackInfo() {
+  const titleEl = DOM.oledVideoTitle || document.getElementById('oled-video-title');
+  const channelEl = DOM.oledChannelName || document.getElementById('oled-channel-name');
+  if (titleEl) {
+    titleEl.textContent = AppState.currentTitle || 'PureStream Music';
+  }
+  if (channelEl) {
+    channelEl.textContent = AppState.currentChannel || 'Ad-Free Playback Active';
+  }
+}
+
+let oledClockInterval = null;
+function startOledClock() {
+  updateOledClockDisplay();
+  if (oledClockInterval) clearInterval(oledClockInterval);
+  oledClockInterval = setInterval(updateOledClockDisplay, 1000);
+}
+
+function stopOledClock() {
+  if (oledClockInterval) {
+    clearInterval(oledClockInterval);
+    oledClockInterval = null;
+  }
+}
+
+function updateOledClockDisplay() {
+  const clockEl = DOM.oledClock || document.getElementById('oled-clock');
+  const dateEl = DOM.oledDate || document.getElementById('oled-date');
+  if (!clockEl) return;
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  clockEl.innerHTML = `${hours}:${minutes} <span class="oled-ampm">${ampm}</span>`;
+  
+  if (dateEl) {
+    dateEl.textContent = now.toLocaleDateString(undefined, {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+}
+
+function toggleAudioMode(forceState) {
+  if (typeof forceState === 'boolean') {
+    AppState.audioMode = forceState;
+  } else {
+    AppState.audioMode = !AppState.audioMode;
+  }
+
+  const overlay = DOM.audioFocusOverlay || document.getElementById('audio-focus-overlay');
+  const btn = DOM.btnAudioMode || document.getElementById('btn-audio-mode');
+  const playerScreenOffBtn = DOM.btnPlayerScreenOff || document.getElementById('btn-player-screen-off');
+
+  if (AppState.audioMode) {
+    // If no video is currently loaded, load a top relaxing music video
+    if (!AppState.currentVideoId || (DOM.playerArena && DOM.playerArena.style.display === 'none')) {
+      loadVideo('k3Gnd0wUluw', false, 'Arijit Singh Mashup 2024 | Nonstop Jukebox', 'Rolex Music');
+    }
+    if (overlay) overlay.style.display = 'flex';
+    if (btn) {
+      btn.classList.add('active');
+      const txt = btn.querySelector('.btn-text');
+      if (txt) txt.textContent = 'Music: ON';
+    }
+    if (playerScreenOffBtn) playerScreenOffBtn.classList.add('active');
+
+    updateOledTrackInfo();
+    startOledClock();
+    enableScreenWakeLock();
+    startBackgroundAudioSession();
+    sendIframeCommand('playVideo');
+    updateOledPlayPauseBtn(true);
+    showToast('🎧 OLED Screen-Off Mode Active — 0% Pixel Power & Pocket Protected', 'success');
+  } else {
+    if (overlay) overlay.style.display = 'none';
+    if (btn) {
+      btn.classList.remove('active');
+      const txt = btn.querySelector('.btn-text');
+      if (txt) txt.textContent = 'Music Mode';
+    }
+    if (playerScreenOffBtn) playerScreenOffBtn.classList.remove('active');
+    stopOledClock();
+    showToast('🔆 Video screen restored', 'info');
+  }
+}
+
+// Anti-Pause Screen-Lock Interceptors
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    // Phone locked or screen turned off
+    if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+      const audio = DOM.bgAudioAnchor || document.getElementById('bg-audio-anchor');
+      if (audio && audio.paused) {
+        audio.play().catch(() => {});
+      }
+      // Counteract YouTube iframe auto-pause on screen off
+      sendIframeCommand('playVideo');
+      setTimeout(() => sendIframeCommand('playVideo'), 150);
+      setTimeout(() => sendIframeCommand('playVideo'), 450);
+      setTimeout(() => sendIframeCommand('playVideo'), 1000);
+    }
+  } else if (document.visibilityState === 'visible') {
+    if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+      sendIframeCommand('playVideo');
+    }
+  }
+}, true);
+
+window.addEventListener('pagehide', () => {
+  if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+    sendIframeCommand('playVideo');
+  }
+}, true);
 
 // ==========================================
 // Video Metadata & Info
@@ -1379,6 +1675,8 @@ async function fetchVideoMetadata(videoId) {
         if (DOM.channelName) DOM.channelName.textContent = AppState.currentChannel;
         document.title = `${data.title} — PureStream (Ad-Free Study)`;
 
+        updateMediaSession(AppState.currentTitle, AppState.currentChannel, AppState.currentThumb);
+        updateOledTrackInfo();
         updateHistoryTitle(videoId, data.title, AppState.currentChannel, AppState.currentThumb);
         return;
       }
@@ -2000,9 +2298,13 @@ function initEventListeners() {
     }
   });
 
-  // Screen Wake Lock Activation on first interaction (required by mobile browsers)
-  document.addEventListener('pointerdown', enableScreenWakeLock, { once: true });
-  document.addEventListener('touchstart', enableScreenWakeLock, { once: true, passive: true });
+  // Screen Wake Lock & Background Audio Activation on first interaction (required by mobile browsers)
+  const initMobileAudioAndWakeLock = () => {
+    enableScreenWakeLock();
+    startBackgroundAudioSession();
+  };
+  document.addEventListener('pointerdown', initMobileAudioAndWakeLock, { once: true });
+  document.addEventListener('touchstart', initMobileAudioAndWakeLock, { once: true, passive: true });
 
   // Clear Input
   DOM.btnClearInput.addEventListener('click', () => {
@@ -2036,9 +2338,26 @@ function initEventListeners() {
     });
   });
 
-  // Audio Mode
-  DOM.btnAudioMode.addEventListener('click', toggleAudioMode);
-  DOM.btnExitAudioMode.addEventListener('click', toggleAudioMode);
+  // Music & OLED Screen-Off Mode Listeners
+  if (DOM.btnAudioMode) DOM.btnAudioMode.addEventListener('click', () => toggleAudioMode());
+  if (DOM.btnPlayerScreenOff) DOM.btnPlayerScreenOff.addEventListener('click', () => toggleAudioMode());
+  if (DOM.btnExitAudioMode) DOM.btnExitAudioMode.addEventListener('click', () => toggleAudioMode(false));
+  if (DOM.btnOledPlayPause) DOM.btnOledPlayPause.addEventListener('click', togglePlayPause);
+  if (DOM.btnOledRewind) DOM.btnOledRewind.addEventListener('click', () => seekVideo(-10));
+  if (DOM.btnOledForward) DOM.btnOledForward.addEventListener('click', () => seekVideo(10));
+
+  // Double-tap anywhere on OLED overlay (except buttons) to wake screen
+  if (DOM.audioFocusOverlay) {
+    let lastOledTap = 0;
+    DOM.audioFocusOverlay.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const now = Date.now();
+      if (now - lastOledTap < 350) {
+        toggleAudioMode(false);
+      }
+      lastOledTap = now;
+    });
+  }
 
   // Pomodoro
   DOM.btnPomodoroToggle.addEventListener('click', () => {

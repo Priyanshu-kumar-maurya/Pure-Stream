@@ -42,13 +42,14 @@
 
       <!-- Quick Action Badges -->
       <div class="header-actions">
-        <!-- Audio Distraction-Free Toggle -->
-        <button id="btn-audio-mode" class="header-btn" title="Audio / Minimal Focus Mode (Screen off / focus mode)">
+        <!-- Audio Distraction-Free / Music Toggle -->
+        <button id="btn-audio-mode" class="header-btn" title="Music & OLED Screen-Off Mode (Screen blacked out / pocket listening)">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
           </svg>
-          <span class="btn-text">Focus</span>
+          <span class="btn-text">Music Mode</span>
         </button>
 
         <!-- Pomodoro Timer Trigger -->
@@ -244,18 +245,6 @@
           <video id="wake-lock-heartbeat" loop playsinline muted style="display:none; width:1px; height:1px;"></video>
         </div>
 
-        <!-- Audio Distraction-Free Overlay (When Audio Mode is active) -->
-        <div id="audio-focus-overlay" class="audio-focus-overlay" style="display:none;">
-          <div class="audio-visualizer">
-            <div class="sound-wave">
-              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <h3>🎧 Distraction-Free Audio / Focus Mode Active</h3>
-            <p>Visual screen dimmed for distraction-free listening and battery conservation.</p>
-            <button id="btn-exit-audio-mode" class="pill-btn secondary">Show Video</button>
-          </div>
-        </div>
-
         <!-- Quality & Mobile Touch Command Bar -->
         <div class="player-command-bar">
           <div class="command-group left">
@@ -280,6 +269,16 @@
             </button>
             <button id="btn-touch-forward" class="cmd-btn" title="Forward 10 Seconds">
               <span>10s ⏩</span>
+            </button>
+
+            <!-- Screen Off / Music Mode Quick Button -->
+            <button id="btn-player-screen-off" class="cmd-btn" title="OLED Screen-Off Pocket Mode (Turn screen black & listen in pocket)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+              <span>🎧 Screen Off</span>
             </button>
 
             <!-- Loop Toggle -->
@@ -962,6 +961,77 @@
       </div>
     </div>
   </div>
+
+  <!-- True OLED Screen-Off Pocket Mode Overlay (0% Pixel Power, Anti-Pocket Touch, Continuous Audio) -->
+  <div id="audio-focus-overlay" class="audio-focus-overlay" style="display:none;" aria-hidden="true">
+    <!-- Top OLED Clock & Battery Info -->
+    <div class="oled-top-bar">
+      <div class="oled-badge">
+        <span class="oled-dot"></span>
+        <span>OLED Screen-Off Active • 0% Pixel Power</span>
+      </div>
+      <div class="oled-clock" id="oled-clock">12:00 <span class="oled-ampm">PM</span></div>
+      <div class="oled-date" id="oled-date">Monday, Oct 5</div>
+    </div>
+
+    <!-- Center Visualizer & Track Info -->
+    <div class="oled-center">
+      <div class="sound-wave">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="oled-track-info">
+        <h2 class="oled-title" id="oled-video-title">PureStream Audio & Music</h2>
+        <p class="oled-channel" id="oled-channel-name">Background Playback Active</p>
+      </div>
+
+      <!-- Pocket Lock Notice -->
+      <div class="pocket-lock-status">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+        <span>Pocket Guard Protected • Screen Pitch Black</span>
+      </div>
+    </div>
+
+    <!-- Bottom OLED Controls -->
+    <div class="oled-bottom-controls">
+      <div class="oled-media-btns">
+        <button id="btn-oled-rewind" class="oled-ctrl-btn" title="Rewind 10 Seconds">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+          <span>-10s</span>
+        </button>
+
+        <button id="btn-oled-playpause" class="oled-ctrl-btn main-play" title="Play / Pause Audio">
+          <svg id="oled-play-icon" viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+
+        <button id="btn-oled-forward" class="oled-ctrl-btn" title="Forward 10 Seconds">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+          <span>+10s</span>
+        </button>
+      </div>
+
+      <!-- Exit Button -->
+      <button id="btn-exit-audio-mode" class="oled-wake-btn" title="Wake screen and show video">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <span>Turn Screen On (Show Video)</span>
+      </button>
+      <div class="oled-tip">Double-tap anywhere to wake screen</div>
+    </div>
+  </div>
+
+  <!-- Background Audio Keep-Alive Anchor (Ensures Continuous Mobile Lock-Screen & Screen-Off Playback) -->
+  <audio id="bg-audio-anchor" loop playsinline preload="auto" style="display:none; width:1px; height:1px;"></audio>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
