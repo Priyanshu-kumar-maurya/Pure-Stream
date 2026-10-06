@@ -328,6 +328,273 @@ const CURATED_VIDEOS = {
 };
 
 // ==========================================
+// Curated Mixes & Multi-Song Playlists
+// (Enables direct playlist song playback and queue)
+// ==========================================
+const CURATED_PLAYLISTS = [
+  {
+    id: 'pl-bollywood-romance',
+    title: 'Mix — Bollywood Romance & Soulful Melodies',
+    channel: 'PureStream Music Mix',
+    category: 'songs',
+    trackCount: 7,
+    thumb: 'https://i.ytimg.com/vi/WWIfHemqSEA/hqdefault.jpg',
+    videos: [
+      {
+        id: 'WWIfHemqSEA',
+        title: 'Banjaare (Barsaat 2005) - Spider-Man (Earth-96283) Edit | 4K 60fps',
+        channel: 'Vibe with V',
+        duration: '4:15',
+        thumb: 'https://i.ytimg.com/vi/WWIfHemqSEA/hqdefault.jpg'
+      },
+      {
+        id: 'H2f7MZaw3Yo',
+        title: 'INAAM - Anuv Jain (Official Lyric Video)',
+        channel: 'Anuv Jain',
+        duration: '3:48',
+        thumb: 'https://i.ytimg.com/vi/H2f7MZaw3Yo/hqdefault.jpg'
+      },
+      {
+        id: '5Eqb_-j3FDA',
+        title: 'Coke Studio | Season 14 | Pasoori | Ali Sethi x Shae Gill',
+        channel: 'Coke Studio',
+        duration: '4:36',
+        thumb: 'https://i.ytimg.com/vi/5Eqb_-j3FDA/hqdefault.jpg'
+      },
+      {
+        id: 'fzXV2_vm-6g',
+        title: 'Arijit Singh Mashup 2024 | Nonstop - Jukebox | Bollywood Hits',
+        channel: 'Rolex Music',
+        duration: '51:01',
+        thumb: 'https://i.ytimg.com/vi/fzXV2_vm-6g/hqdefault.jpg'
+      },
+      {
+        id: 'LElOSR7cJyM',
+        title: 'Top 20 Bollywood Romance | Audio Jukebox | Best Romantic Songs',
+        channel: 'Sony Music India',
+        duration: '1:41:37',
+        thumb: 'https://i.ytimg.com/vi/LElOSR7cJyM/hqdefault.jpg'
+      },
+      {
+        id: 'zeVWTY31Vn8',
+        title: 'Top 30 Romantic Hindi Songs | Non-Stop Audio Jukebox (2.5 Hours)',
+        channel: 'Bollywood Classics',
+        duration: '2:25:22',
+        thumb: 'https://i.ytimg.com/vi/zeVWTY31Vn8/hqdefault.jpg'
+      },
+      {
+        id: 't3NOpF5ieBo',
+        title: 'Lofi Bollywood Mashup ❤️ | Classic vs Modern Melodies',
+        channel: 'Gravero Lofi',
+        duration: '24:38',
+        thumb: 'https://i.ytimg.com/vi/t3NOpF5ieBo/hqdefault.jpg'
+      }
+    ]
+  },
+  {
+    id: 'pl-arijit-singh',
+    title: 'Playlist — Best of Arijit Singh & Romantic Jukeboxes',
+    channel: 'Bollywood Soulful Mix',
+    category: 'songs',
+    trackCount: 5,
+    thumb: 'https://i.ytimg.com/vi/fzXV2_vm-6g/hqdefault.jpg',
+    videos: [
+      {
+        id: 'fzXV2_vm-6g',
+        title: 'Arijit Singh Mashup 2024 | Nonstop - Jukebox | Bollywood Hits',
+        channel: 'Rolex Music',
+        duration: '51:01',
+        thumb: 'https://i.ytimg.com/vi/fzXV2_vm-6g/hqdefault.jpg'
+      },
+      {
+        id: 'LElOSR7cJyM',
+        title: 'Top 20 Bollywood Romance | Audio Jukebox | Best Romantic Songs',
+        channel: 'Sony Music India',
+        duration: '1:41:37',
+        thumb: 'https://i.ytimg.com/vi/LElOSR7cJyM/hqdefault.jpg'
+      },
+      {
+        id: 'zeVWTY31Vn8',
+        title: 'Top 30 Romantic Hindi Songs | Non-Stop Audio Jukebox (2.5 Hours)',
+        channel: 'Bollywood Classics',
+        duration: '2:25:22',
+        thumb: 'https://i.ytimg.com/vi/zeVWTY31Vn8/hqdefault.jpg'
+      },
+      {
+        id: 't3NOpF5ieBo',
+        title: 'Lofi Bollywood Mashup ❤️ | Classic vs Modern Melodies',
+        channel: 'Gravero Lofi',
+        duration: '24:38',
+        thumb: 'https://i.ytimg.com/vi/t3NOpF5ieBo/hqdefault.jpg'
+      },
+      {
+        id: 'WWIfHemqSEA',
+        title: 'Banjaare (Barsaat 2005) - Spider-Man (Earth-96283) Edit | 4K 60fps',
+        channel: 'Vibe with V',
+        duration: '4:15',
+        thumb: 'https://i.ytimg.com/vi/WWIfHemqSEA/hqdefault.jpg'
+      }
+    ]
+  },
+  {
+    id: 'pl-lofi-beats',
+    title: 'Mix — 24/7 Deep Study & Chill Lofi Beats',
+    channel: 'Lofi Girl & Chill Beats',
+    category: 'lofi',
+    trackCount: 5,
+    thumb: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg',
+    videos: [
+      {
+        id: 'jfKfPfyJRdk',
+        title: 'lofi hip hop radio 📚 beats to relax/study to [24/7 Live Stream]',
+        channel: 'Lofi Girl',
+        duration: '24/7 Live',
+        thumb: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg'
+      },
+      {
+        id: '5qap5aO4i9A',
+        title: 'lofi hip hop radio 💤 beats to sleep/chill to [24/7 Live Stream]',
+        channel: 'Lofi Girl',
+        duration: '24/7 Live',
+        thumb: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg'
+      },
+      {
+        id: 'zoFLbJ_09aM',
+        title: 'Mind Relax Lofi Mashup | Mind Relaxing Songs for Focus & Sleep',
+        channel: 'Relaxing Beats',
+        duration: '29:33',
+        thumb: 'https://i.ytimg.com/vi/zoFLbJ_09aM/hqdefault.jpg'
+      },
+      {
+        id: 'WPni755-Krg',
+        title: 'Study Music Alpha Waves: Relaxing Studying Music, Brain Power (3 Hours)',
+        channel: 'Yellow Brick Cinema',
+        duration: '3:00:00',
+        thumb: 'https://i.ytimg.com/vi/WPni755-Krg/hqdefault.jpg'
+      },
+      {
+        id: 'DWcJFNfaw9c',
+        title: 'lofi hip hop radio - beats to sleep/chill to [Deep Chill]',
+        channel: 'Lofi Girl',
+        duration: '24/7 Live',
+        thumb: 'https://i.ytimg.com/vi/DWcJFNfaw9c/hqdefault.jpg'
+      }
+    ]
+  },
+  {
+    id: 'pl-coding-mastery',
+    title: 'Playlist — Full-Stack Web Development & Python Mastery',
+    channel: 'PureStream Coding Roadmaps',
+    category: 'coding',
+    trackCount: 7,
+    thumb: 'https://i.ytimg.com/vi/eIrMbAQSU34/hqdefault.jpg',
+    videos: [
+      {
+        id: 'eIrMbAQSU34',
+        title: 'AI will take my job | Chai aur Code (Software Engineering Reality)',
+        channel: 'Chai aur Code',
+        duration: '31:06',
+        thumb: 'https://i.ytimg.com/vi/eIrMbAQSU34/hqdefault.jpg'
+      },
+      {
+        id: 'rfscVS0vtbw',
+        title: 'Learn Python - Full Course for Beginners [Tutorial 4+ Hours]',
+        channel: 'freeCodeCamp.org',
+        duration: '4:26:52',
+        thumb: 'https://i.ytimg.com/vi/rfscVS0vtbw/hqdefault.jpg'
+      },
+      {
+        id: '_uQrJ0TkZlc',
+        title: 'Python Full Course for Beginners in Hindi | Complete Python Course (10h)',
+        channel: 'CodeWithHarry',
+        duration: '10:04:32',
+        thumb: 'https://i.ytimg.com/vi/_uQrJ0TkZlc/hqdefault.jpg'
+      },
+      {
+        id: 'bMknfKXIFA8',
+        title: 'React Course - Beginner\'s Tutorial for React JavaScript [Full Course]',
+        channel: 'freeCodeCamp.org',
+        duration: '11:55:28',
+        thumb: 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg'
+      },
+      {
+        id: 'W6NZfCO5SIk',
+        title: 'JavaScript Course for Beginners – Your First Web Applications',
+        channel: 'freeCodeCamp.org',
+        duration: '3:26:42',
+        thumb: 'https://i.ytimg.com/vi/W6NZfCO5SIk/hqdefault.jpg'
+      },
+      {
+        id: 'grEKMHGYyns',
+        title: 'Learn Java 8 - Full Tutorial for Beginners (Complete Course)',
+        channel: 'freeCodeCamp.org',
+        duration: '9:33:14',
+        thumb: 'https://i.ytimg.com/vi/grEKMHGYyns/hqdefault.jpg'
+      },
+      {
+        id: '7S_tz1z_5bA',
+        title: 'MySQL Database - Full Course for Beginners (Database Design)',
+        channel: 'freeCodeCamp.org',
+        duration: '3:20:11',
+        thumb: 'https://i.ytimg.com/vi/7S_tz1z_5bA/hqdefault.jpg'
+      }
+    ]
+  },
+  {
+    id: 'pl-science-revision',
+    title: 'Playlist — Class 12 & JEE/NEET Revision Mega Marathons',
+    channel: 'PureStream Academics',
+    category: 'study',
+    trackCount: 6,
+    thumb: 'https://i.ytimg.com/vi/qDZik-DcQJA/hqdefault.jpg',
+    videos: [
+      {
+        id: 'qDZik-DcQJA',
+        title: 'Complete Class 12th PHYSICS in 1 Shot | Concepts + PYQs Marathon',
+        channel: 'Physics Wallah - Alakh Pandey',
+        duration: '11:45:00',
+        thumb: 'https://i.ytimg.com/vi/qDZik-DcQJA/hqdefault.jpg'
+      },
+      {
+        id: '3znerIFcpPY',
+        title: 'Complete Class 12th PHYSICS in 1 Shot || Full Revision Marathon',
+        channel: 'Physics Wallah',
+        duration: '10:15:30',
+        thumb: 'https://i.ytimg.com/vi/3znerIFcpPY/hqdefault.jpg'
+      },
+      {
+        id: 'Lkwx_do37wU',
+        title: 'Complete Class 12th CHEMISTRY Revision 📖🔥 | ALL Concepts Covered',
+        channel: 'Chemistry Wallah',
+        duration: '12:08:45',
+        thumb: 'https://i.ytimg.com/vi/Lkwx_do37wU/hqdefault.jpg'
+      },
+      {
+        id: '3p3gxbcpbe0',
+        title: 'Integration Class 12 One Shot | Class 12th Maths Complete Revision',
+        channel: 'Maths Unplugged',
+        duration: '7:50:20',
+        thumb: 'https://i.ytimg.com/vi/3p3gxbcpbe0/hqdefault.jpg'
+      },
+      {
+        id: 'e-GKLde9V9s',
+        title: 'Complete Class 12 BIOLOGY One Shot 🔥 | For NEET 2026 / 12th Boards',
+        channel: 'Competition Wallah',
+        duration: '9:12:15',
+        thumb: 'https://i.ytimg.com/vi/e-GKLde9V9s/hqdefault.jpg'
+      },
+      {
+        id: 'fNk_zzaMoSs',
+        title: 'Calculus 1 - Full College Course | Derivatives & Integrals Explained',
+        channel: 'freeCodeCamp.org',
+        duration: '11:54:20',
+        thumb: 'https://i.ytimg.com/vi/fNk_zzaMoSs/hqdefault.jpg'
+      }
+    ]
+  }
+];
+
+// ==========================================
 // Dynamic Video Helpers (YouTube Style Diversity)
 // ==========================================
 function getAllCuratedVideos(shuffle = false) {
@@ -417,6 +684,9 @@ const AppState = {
   audioMode: false,
   isPlaying: false,
   isUserPaused: false,
+  activePlaylist: null, // Currently active playlist object with currentIndex
+  playlistAutoplay: true,
+  recommendationFilter: 'all', // 'all', 'songs', 'playlists'
   engine: 'nocookie', // 'nocookie', 'youtube', 'yewtu', 'piped'
   targetResumeSeconds: 0,
   currentPlaybackSeconds: 0,
@@ -475,6 +745,20 @@ const DOM = {
   btnPopoutPlayer: document.getElementById('btn-popout-player'),
   qualityIndicator: document.getElementById('quality-indicator'),
   btnLoopToggle: document.getElementById('btn-loop-toggle'),
+  activePlaylistPanel: document.getElementById('active-playlist-panel'),
+  activePlaylistTitle: document.getElementById('active-playlist-title'),
+  playlistBadgeTitle: document.getElementById('playlist-badge-title'),
+  playlistTrackIndicator: document.getElementById('playlist-track-indicator'),
+  playlistChannelLabel: document.getElementById('playlist-channel-label'),
+  activePlaylistItems: document.getElementById('active-playlist-items'),
+  btnPlaylistPrev: document.getElementById('btn-playlist-prev'),
+  btnPlaylistNext: document.getElementById('btn-playlist-next'),
+  btnPlaylistAutoplay: document.getElementById('btn-playlist-autoplay'),
+  btnPlaylistClose: document.getElementById('btn-playlist-close'),
+  recommendationsHeading: document.getElementById('recommendations-heading'),
+  recommendationsSubtext: document.getElementById('recommendations-subtext'),
+  gridRecommendations: document.getElementById('grid-recommendations'),
+  gridSongsPlaylists: document.getElementById('grid-songs-playlists'),
   btnSleepTimer: document.getElementById('btn-sleep-timer'),
   sleepTimerText: document.getElementById('sleep-timer-text'),
   btnFullscreen: document.getElementById('btn-fullscreen'),
@@ -1487,10 +1771,18 @@ function updateMediaSession(title, channel, thumb) {
         seekVideo(details && details.seekOffset ? details.seekOffset : 10);
       }],
       ['previoustrack', () => {
-        seekVideo(-10);
+        if (AppState.activePlaylist) {
+          playPreviousPlaylistItem();
+        } else {
+          seekVideo(-10);
+        }
       }],
       ['nexttrack', () => {
-        seekVideo(10);
+        if (AppState.activePlaylist) {
+          playNextPlaylistItem();
+        } else {
+          seekVideo(10);
+        }
       }],
       ['stop', () => {
         AppState.isPlaying = false;
@@ -2014,13 +2306,302 @@ function createVideoCardElement(video) {
   return card;
 }
 
+// ==========================================
+// Curated Playlists & Up Next Queue Engine
+// ==========================================
+function createPlaylistCardElement(playlist) {
+  const card = document.createElement('div');
+  card.className = 'video-card is-playlist';
+  card.dataset.playlistId = playlist.id;
+
+  const totalTracks = playlist.videos ? playlist.videos.length : (playlist.trackCount || 5);
+
+  card.innerHTML = `
+    <div class="card-thumb-wrapper">
+      <img src="${playlist.thumb}" alt="${escapeHtml(playlist.title)}" class="card-thumb" loading="lazy" />
+      <div class="thumb-overlay-playlist">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M4 10h12v2H4zm0-4h12v2H4zm0 8h8v2H4zm10 0v6l5-3z"/>
+        </svg>
+        <span>${totalTracks} TRACKS</span>
+      </div>
+      <div class="card-badges">
+        <span class="badge-playlist-tag">📑 PLAYLIST</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-header-row">
+        <div class="card-channel-avatar" style="background:#00e5ff; color:#000; font-weight:800; font-size:0.75rem;">▶</div>
+        <div class="card-title-col">
+          <h3 class="card-title" title="${escapeHtml(playlist.title)}">${escapeHtml(playlist.title)}</h3>
+          <div class="card-channel-row">
+            <span class="card-channel">${escapeHtml(playlist.channel)}</span>
+            <span class="card-verified-badge" title="Verified">✓</span>
+          </div>
+          <div class="card-meta-row">
+            <span>Non-stop Mix • ${totalTracks} Songs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  card.addEventListener('click', () => {
+    loadPlaylist(playlist.id, 0);
+  });
+
+  return card;
+}
+
+function loadPlaylist(playlistId, startTrackIndex = 0) {
+  const playlist = CURATED_PLAYLISTS.find(p => p.id === playlistId);
+  if (!playlist || !playlist.videos || playlist.videos.length === 0) return;
+
+  AppState.activePlaylist = {
+    ...playlist,
+    currentIndex: Math.max(0, Math.min(startTrackIndex, playlist.videos.length - 1))
+  };
+  AppState.playlistAutoplay = true;
+
+  renderActivePlaylistPanel();
+
+  const track = playlist.videos[AppState.activePlaylist.currentIndex];
+  loadVideo(track.id, true, track.title, track.channel, track.thumb);
+
+  showToast(`📑 Now Playing Playlist: ${playlist.title} (Track ${AppState.activePlaylist.currentIndex + 1}/${playlist.videos.length})`, 'success');
+}
+
+function renderActivePlaylistPanel() {
+  const panel = DOM.activePlaylistPanel || document.getElementById('active-playlist-panel');
+  if (!panel) return;
+
+  if (!AppState.activePlaylist || !AppState.activePlaylist.videos) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const pl = AppState.activePlaylist;
+  panel.style.display = 'block';
+
+  const titleEl = DOM.activePlaylistTitle || document.getElementById('active-playlist-title');
+  const channelEl = DOM.playlistChannelLabel || document.getElementById('playlist-channel-label');
+  const indicatorEl = DOM.playlistTrackIndicator || document.getElementById('playlist-track-indicator');
+  const autoplayBtn = DOM.btnPlaylistAutoplay || document.getElementById('btn-playlist-autoplay');
+  const itemsContainer = DOM.activePlaylistItems || document.getElementById('active-playlist-items');
+
+  if (titleEl) titleEl.textContent = pl.title;
+  if (channelEl) channelEl.textContent = pl.channel || 'PureStream Music';
+  if (indicatorEl) indicatorEl.textContent = `Track ${pl.currentIndex + 1} of ${pl.videos.length}`;
+
+  if (autoplayBtn) {
+    if (AppState.playlistAutoplay) {
+      autoplayBtn.classList.add('active');
+      autoplayBtn.querySelector('span:last-child').textContent = 'Autoplay Next';
+    } else {
+      autoplayBtn.classList.remove('active');
+      autoplayBtn.querySelector('span:last-child').textContent = 'Autoplay: OFF';
+    }
+  }
+
+  if (itemsContainer) {
+    itemsContainer.innerHTML = '';
+    pl.videos.forEach((track, idx) => {
+      const isCurrent = idx === pl.currentIndex;
+      const item = document.createElement('div');
+      item.className = `playlist-track-item ${isCurrent ? 'is-active' : ''}`;
+      item.dataset.index = idx;
+      item.title = `Click to play directly: ${track.title}`;
+
+      item.innerHTML = `
+        <span class="track-item-num">${isCurrent ? '▶' : (idx + 1)}</span>
+        <img src="${track.thumb || `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`}" alt="${escapeHtml(track.title)}" class="track-item-thumb" loading="lazy" />
+        <div class="track-item-meta">
+          <span class="track-item-title">${escapeHtml(track.title)}</span>
+          <span class="track-item-channel">${escapeHtml(track.channel || '')} • ${track.duration || ''}</span>
+        </div>
+      `;
+
+      item.addEventListener('click', () => {
+        playPlaylistItemByIndex(idx);
+      });
+
+      itemsContainer.appendChild(item);
+    });
+
+    const activeEl = itemsContainer.children[pl.currentIndex];
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
+}
+
+function playPlaylistItemByIndex(index) {
+  if (!AppState.activePlaylist || !AppState.activePlaylist.videos[index]) return;
+  AppState.activePlaylist.currentIndex = index;
+  const track = AppState.activePlaylist.videos[index];
+
+  const indicatorEl = DOM.playlistTrackIndicator || document.getElementById('playlist-track-indicator');
+  if (indicatorEl) {
+    indicatorEl.textContent = `Track ${index + 1} of ${AppState.activePlaylist.videos.length}`;
+  }
+
+  const itemsContainer = DOM.activePlaylistItems || document.getElementById('active-playlist-items');
+  if (itemsContainer) {
+    Array.from(itemsContainer.children).forEach((child, i) => {
+      if (i === index) {
+        child.classList.add('is-active');
+        const num = child.querySelector('.track-item-num');
+        if (num) num.textContent = '▶';
+        child.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      } else {
+        child.classList.remove('is-active');
+        const num = child.querySelector('.track-item-num');
+        if (num) num.textContent = String(i + 1);
+      }
+    });
+  }
+
+  loadVideo(track.id, false, track.title, track.channel, track.thumb);
+  showToast(`▶️ Playing: ${track.title}`, 'info');
+}
+
+function playNextPlaylistItem() {
+  if (!AppState.activePlaylist || !AppState.activePlaylist.videos) return;
+  const nextIdx = (AppState.activePlaylist.currentIndex + 1) % AppState.activePlaylist.videos.length;
+  playPlaylistItemByIndex(nextIdx);
+}
+
+function playPreviousPlaylistItem() {
+  if (!AppState.activePlaylist || !AppState.activePlaylist.videos) return;
+  const len = AppState.activePlaylist.videos.length;
+  const prevIdx = (AppState.activePlaylist.currentIndex - 1 + len) % len;
+  playPlaylistItemByIndex(prevIdx);
+}
+
+function getVideoCategory(videoId, title = '', channel = '') {
+  for (const cat of Object.keys(CURATED_VIDEOS)) {
+    if (CURATED_VIDEOS[cat].some(v => v.id === videoId)) {
+      if (cat === 'songs' || cat === 'lofi') return 'music';
+      return cat;
+    }
+  }
+  for (const pl of CURATED_PLAYLISTS) {
+    if (pl.videos && pl.videos.some(v => v.id === videoId)) {
+      if (pl.category === 'songs' || pl.category === 'lofi') return 'music';
+      return pl.category;
+    }
+  }
+  const text = `${title} ${channel}`.toLowerCase();
+  if (/(song|music|mashup|jukebox|audio|lofi|acoustic|lyrics|arijit|anuv|pasoori|barsaat|romance|gravero|bollywood|coke studio|beats|singer|hits|singer|album)/i.test(text)) {
+    return 'music';
+  }
+  if (/(code|coding|python|javascript|web dev|developer|programming|html|css|react|ai|tech|software|chai aur code|codewithharry)/i.test(text)) {
+    return 'coding';
+  }
+  if (/(physics|chemistry|neet|jee|math|revision|oneshot|one shot|study|lecture|drishti|upsc|exam|alakh)/i.test(text)) {
+    return 'study';
+  }
+  return 'general';
+}
+
+function renderRecommendations(currentId = null) {
+  const container = DOM.gridRecommendations || document.getElementById('grid-recommendations');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const id = currentId || AppState.currentVideoId;
+  const category = getVideoCategory(id, AppState.currentTitle, AppState.currentChannel);
+  const filter = AppState.recommendationFilter || 'all';
+
+  const heading = DOM.recommendationsHeading || document.getElementById('recommendations-heading');
+  const subtext = DOM.recommendationsSubtext || document.getElementById('recommendations-subtext');
+  if (heading && subtext) {
+    if (category === 'music') {
+      heading.textContent = '🎵 Up Next & Related Songs';
+      subtext.textContent = 'Non-stop songs and music mixes • Click any song or playlist to play directly';
+    } else if (category === 'coding') {
+      heading.textContent = '💻 Related Coding Tutorials & Bootcamps';
+      subtext.textContent = 'Developer roadmaps and programming courses';
+    } else if (category === 'study') {
+      heading.textContent = '📚 Related Lectures & One-Shot Marathons';
+      subtext.textContent = 'Full chapter revisions and concept marathons';
+    } else {
+      heading.textContent = '✨ Up Next / Recommended Videos';
+      subtext.textContent = 'Click any video or playlist to play instantly without ads';
+    }
+  }
+
+  let relevantPlaylists = [];
+  if (category === 'music') {
+    relevantPlaylists = CURATED_PLAYLISTS.filter(p => p.category === 'songs' || p.category === 'lofi');
+  } else if (category === 'coding') {
+    relevantPlaylists = CURATED_PLAYLISTS.filter(p => p.category === 'coding');
+  } else if (category === 'study') {
+    relevantPlaylists = CURATED_PLAYLISTS.filter(p => p.category === 'study');
+  } else {
+    relevantPlaylists = CURATED_PLAYLISTS;
+  }
+
+  let relevantVideos = [];
+  if (category === 'music') {
+    const songList = [...(CURATED_VIDEOS.songs || []), ...(CURATED_VIDEOS.lofi || [])];
+    relevantVideos = songList.filter(v => v.id !== id);
+  } else if (category === 'coding') {
+    relevantVideos = (CURATED_VIDEOS.coding || []).filter(v => v.id !== id);
+  } else if (category === 'study') {
+    const studyList = [...(CURATED_VIDEOS.study || []), ...(CURATED_VIDEOS.upsc || [])];
+    relevantVideos = studyList.filter(v => v.id !== id);
+  } else {
+    relevantVideos = getAllCuratedVideos().filter(v => v.id !== id);
+  }
+
+  if (filter === 'playlists') {
+    relevantPlaylists.forEach(pl => container.appendChild(createPlaylistCardElement(pl)));
+  } else if (filter === 'songs') {
+    relevantVideos.slice(0, 10).forEach(v => container.appendChild(createVideoCardElement(v)));
+  } else {
+    relevantPlaylists.forEach(pl => container.appendChild(createPlaylistCardElement(pl)));
+    relevantVideos.slice(0, 8).forEach(v => container.appendChild(createVideoCardElement(v)));
+  }
+
+  // Auto-Attach Playlist Queue if none active and playing music
+  if (!AppState.activePlaylist && category === 'music') {
+    const matchingPl = CURATED_PLAYLISTS.find(p => p.videos && p.videos.some(v => v.id === id)) 
+      || CURATED_PLAYLISTS[0];
+    if (matchingPl) {
+      const trackIdx = matchingPl.videos.findIndex(v => v.id === id);
+      AppState.activePlaylist = {
+        ...matchingPl,
+        currentIndex: trackIdx >= 0 ? trackIdx : 0
+      };
+      renderActivePlaylistPanel();
+    }
+  } else if (AppState.activePlaylist) {
+    renderActivePlaylistPanel();
+  }
+}
+
 function initCuratedGrids() {
   const allContainer = document.getElementById('grid-all');
   if (allContainer) {
     allContainer.innerHTML = '';
+    // Show top playlists on home feed
+    CURATED_PLAYLISTS.slice(0, 2).forEach(pl => {
+      allContainer.appendChild(createPlaylistCardElement(pl));
+    });
     const allList = getAllCuratedVideos();
     allList.forEach(item => {
       allContainer.appendChild(createVideoCardElement(item));
+    });
+  }
+
+  // Populate curated playlists in Songs tab
+  const songsPlaylistsContainer = document.getElementById('grid-songs-playlists');
+  if (songsPlaylistsContainer) {
+    songsPlaylistsContainer.innerHTML = '';
+    const musicPlaylists = CURATED_PLAYLISTS.filter(p => p.category === 'songs' || p.category === 'lofi');
+    musicPlaylists.forEach(pl => {
+      songsPlaylistsContainer.appendChild(createPlaylistCardElement(pl));
     });
   }
 
@@ -2035,17 +2616,6 @@ function initCuratedGrids() {
   });
 
   renderRecommendations();
-}
-
-function renderRecommendations(currentId = null) {
-  const container = document.getElementById('grid-recommendations');
-  if (!container) return;
-  container.innerHTML = '';
-  const allList = getAllCuratedVideos().filter(v => v.id !== currentId);
-  const picked = allList.slice(0, 8);
-  picked.forEach(item => {
-    container.appendChild(createVideoCardElement(item));
-  });
 }
 
 function renderHistoryGrid() {
@@ -2358,6 +2928,68 @@ function initEventListeners() {
       lastOledTap = now;
     });
   }
+
+  // Playlist Queue Navigation & Autoplay
+  if (DOM.btnPlaylistPrev) DOM.btnPlaylistPrev.addEventListener('click', playPreviousPlaylistItem);
+  if (DOM.btnPlaylistNext) DOM.btnPlaylistNext.addEventListener('click', playNextPlaylistItem);
+  if (DOM.btnPlaylistAutoplay) {
+    DOM.btnPlaylistAutoplay.addEventListener('click', () => {
+      AppState.playlistAutoplay = !AppState.playlistAutoplay;
+      if (AppState.playlistAutoplay) {
+        DOM.btnPlaylistAutoplay.classList.add('active');
+        DOM.btnPlaylistAutoplay.querySelector('span:last-child').textContent = 'Autoplay Next';
+        showToast('🔁 Playlist Autoplay: ON', 'info');
+      } else {
+        DOM.btnPlaylistAutoplay.classList.remove('active');
+        DOM.btnPlaylistAutoplay.querySelector('span:last-child').textContent = 'Autoplay: OFF';
+        showToast('Autoplay: OFF', 'info');
+      }
+    });
+  }
+  if (DOM.btnPlaylistClose) {
+    DOM.btnPlaylistClose.addEventListener('click', () => {
+      if (DOM.activePlaylistPanel) DOM.activePlaylistPanel.style.display = 'none';
+      AppState.activePlaylist = null;
+      showToast('Playlist queue hidden', 'info');
+    });
+  }
+
+  // Recommendations Filter Pills (All / Songs / Playlists)
+  document.querySelectorAll('.rec-filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.rec-filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      AppState.recommendationFilter = pill.dataset.filter || 'all';
+      renderRecommendations(AppState.currentVideoId);
+    });
+  });
+
+  // YouTube Iframe PostMessage Listener for Autoplay Next Track
+  window.addEventListener('message', (event) => {
+    if (!event.data) return;
+    try {
+      let data = event.data;
+      if (typeof data === 'string') {
+        data = JSON.parse(data);
+      }
+      if (data && data.event === 'onStateChange') {
+        const state = data.info; // 0 = ended, 1 = playing, 2 = paused
+        if (state === 0) {
+          if (AppState.activePlaylist && AppState.playlistAutoplay) {
+            playNextPlaylistItem();
+          }
+        } else if (state === 1) {
+          AppState.isPlaying = true;
+          AppState.isUserPaused = false;
+          startBackgroundAudioSession();
+        } else if (state === 2) {
+          if (document.visibilityState === 'visible') {
+            AppState.isPlaying = false;
+          }
+        }
+      }
+    } catch (e) {}
+  });
 
   // Pomodoro
   DOM.btnPomodoroToggle.addEventListener('click', () => {

@@ -362,12 +362,50 @@
             <div id="notes-chips-container" class="notes-chips-container"></div>
           </div>
 
-          <!-- Up Next / Recommended Section below player -->
+          <!-- Active Playlist & Up Next Queue Panel (Direct playlist song playback) -->
+          <div id="active-playlist-panel" class="active-playlist-panel" style="display:none;">
+            <div class="playlist-panel-header">
+              <div class="playlist-info-col">
+                <div class="playlist-badge-tag">
+                  <span class="pulse-dot-cyan"></span>
+                  <span id="playlist-badge-title">📑 PLAYING FROM MIX / PLAYLIST</span>
+                </div>
+                <h4 id="active-playlist-title" class="playlist-current-title">Bollywood Romance &amp; Hits Mix</h4>
+                <div class="playlist-meta-row">
+                  <span id="playlist-track-indicator" class="track-indicator">Track 1 of 7</span>
+                  <span class="bullet">•</span>
+                  <span id="playlist-channel-label" class="playlist-owner">PureStream Music Mix</span>
+                </div>
+              </div>
+              <div class="playlist-actions-col">
+                <button id="btn-playlist-prev" class="playlist-nav-btn" title="Previous Track (Shift+P)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button id="btn-playlist-next" class="playlist-nav-btn" title="Next Track (Shift+N)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+                <button id="btn-playlist-autoplay" class="playlist-toggle-btn active" title="Toggle Autoplay Next Track">
+                  <span class="toggle-dot"></span>
+                  <span>Autoplay Next</span>
+                </button>
+                <button id="btn-playlist-close" class="playlist-close-btn" title="Hide Playlist Queue">✕</button>
+              </div>
+            </div>
+            <!-- Scrollable Track List for Direct Playback -->
+            <div id="active-playlist-items" class="active-playlist-items"></div>
+          </div>
+
+          <!-- Up Next / Context-Aware Suggestions Below Player -->
           <div class="watch-recommendations" id="watch-recommendations">
             <div class="grid-header flex-between" style="margin-top:1.25rem; margin-bottom:0.75rem;">
               <div>
-                <h3 style="font-size:1.1rem; color:#fff; font-weight:700;">✨ Up Next / Recommended Videos</h3>
-                <span class="sub-text">Click any video to switch and play instantly without ads</span>
+                <h3 id="recommendations-heading" style="font-size:1.1rem; color:#fff; font-weight:700;">🎵 Up Next &amp; Related Songs</h3>
+                <span id="recommendations-subtext" class="sub-text">Recommended based on current song • Click any song or playlist to play directly</span>
+              </div>
+              <div class="recs-filter-pills" id="recs-filter-pills">
+                <button class="rec-filter-pill active" data-filter="all">All</button>
+                <button class="rec-filter-pill" data-filter="songs">Songs</button>
+                <button class="rec-filter-pill" data-filter="playlists">Playlists</button>
               </div>
             </div>
             <div class="video-grid" id="grid-recommendations"></div>
@@ -763,13 +801,24 @@
           <div class="video-grid" id="grid-coding"></div>
         </div>
 
-        <!-- Songs Jukebox Tab Pane -->
+        <!-- Songs Jukebox & Playlists Tab Pane -->
         <div class="tab-pane" id="pane-songs">
           <div class="grid-header">
-            <h2>Non-Stop Song Jukeboxes &amp; Long Albums (1 to 4 Hours)</h2>
-            <span class="sub-text">Ad-free streaming for your favorite music playlists, OSTs, and artist albums</span>
+            <h2>Non-Stop Song Jukeboxes, Mixes &amp; Playlists</h2>
+            <span class="sub-text">Ad-free streaming for your favorite music playlists, mixes, and artist albums</span>
           </div>
-          <div class="video-grid" id="grid-songs"></div>
+
+          <!-- Curated Playlists & Mixes -->
+          <div class="playlists-row-section">
+            <h3 class="playlists-row-title">📑 Curated Music Mixes &amp; Playlists (Click to play directly)</h3>
+            <div class="video-grid" id="grid-songs-playlists"></div>
+          </div>
+
+          <!-- Individual Hit Songs & Jukeboxes -->
+          <div class="playlists-row-section" style="margin-top:1.75rem;">
+            <h3 class="playlists-row-title">🎵 Individual Hit Songs &amp; 2-Hour Audio Jukeboxes</h3>
+            <div class="video-grid" id="grid-songs"></div>
+          </div>
         </div>
 
         <!-- Lofi & Study Music Tab Pane -->
