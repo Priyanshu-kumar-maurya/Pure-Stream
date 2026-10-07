@@ -271,14 +271,14 @@
               <span>10s ⏩</span>
             </button>
 
-            <!-- Screen Off / Music Mode Quick Button -->
-            <button id="btn-player-screen-off" class="cmd-btn" title="OLED Screen-Off Pocket Mode (Turn screen black & listen in pocket)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- Screen Off / Music Mode Hero Button -->
+            <button id="btn-player-screen-off" class="cmd-btn btn-screen-off-highlight" title="OLED Screen-Off Pocket Mode (Turn screen black & listen in pocket with 0% battery)">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 18V5l12-2v13"></path>
                 <circle cx="6" cy="18" r="3"></circle>
                 <circle cx="18" cy="16" r="3"></circle>
               </svg>
-              <span>🎧 Screen Off</span>
+              <span>🎧 Screen Off (Pocket Mode)</span>
             </button>
 
             <!-- Loop Toggle -->
@@ -299,6 +299,23 @@
               </svg>
             </button>
           </div>
+        </div>
+
+        <!-- Mobile OLED Screen-Off & Pocket Mode Banner -->
+        <div id="mobile-screen-off-banner" class="mobile-screen-off-banner">
+          <div class="screen-off-banner-left">
+            <span class="screen-off-banner-icon">🎧</span>
+            <div class="screen-off-banner-text">
+              <strong>Listen with Screen Off (0% Battery &amp; Pocket Safe)</strong>
+              <span>Turn display 100% pitch black to save battery &amp; keep music playing!</span>
+            </div>
+          </div>
+          <button id="btn-banner-screen-off" class="btn-banner-screen-off" type="button" title="Turn screen black and listen in pocket">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+            </svg>
+            <span>Black Screen</span>
+          </button>
         </div>
 
         <!-- Video Playback Troubleshooting & Fix Alert Box -->
@@ -1081,6 +1098,22 @@
 
   <!-- Background Audio Keep-Alive Anchor (Ensures Continuous Mobile Lock-Screen & Screen-Off Playback) -->
   <audio id="bg-audio-anchor" loop playsinline preload="auto" style="display:none; width:1px; height:1px;"></audio>
+
+  <!-- Floating Lock-Screen Auto-Resume Widget (Displays if browser suspended audio on phone lock) -->
+  <div id="lock-resume-widget" class="lock-resume-widget" style="display:none;" aria-live="polite">
+    <div class="lock-resume-info">
+      <span class="lock-resume-dot"></span>
+      <div class="lock-resume-text">
+        <strong id="lock-resume-title">PureStream Music</strong>
+        <span>Paused on phone lock • Tap to resume</span>
+      </div>
+    </div>
+    <button id="btn-lock-resume-action" class="btn-lock-resume-action" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <span>Resume</span>
+    </button>
+    <button id="btn-lock-resume-dismiss" class="btn-lock-resume-dismiss" type="button" aria-label="Dismiss">✕</button>
+  </div>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>

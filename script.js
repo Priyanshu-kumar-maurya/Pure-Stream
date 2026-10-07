@@ -723,6 +723,12 @@ const DOM = {
   resumeTimeStr: document.getElementById('resume-time-str'),
   btnResumeAccept: document.getElementById('btn-resume-accept'),
   btnResumeDismiss: document.getElementById('btn-resume-dismiss'),
+  btnBannerScreenOff: document.getElementById('btn-banner-screen-off'),
+  mobileScreenOffBanner: document.getElementById('mobile-screen-off-banner'),
+  lockResumeWidget: document.getElementById('lock-resume-widget'),
+  lockResumeTitle: document.getElementById('lock-resume-title'),
+  btnLockResumeAction: document.getElementById('btn-lock-resume-action'),
+  btnLockResumeDismiss: document.getElementById('btn-lock-resume-dismiss'),
   audioFocusOverlay: document.getElementById('audio-focus-overlay'),
   btnExitAudioMode: document.getElementById('btn-exit-audio-mode'),
   btnPlayerScreenOff: document.getElementById('btn-player-screen-off'),
@@ -1027,8 +1033,21 @@ function fallbackHeartbeatLock() {
   const video = DOM.wakeLockHeartbeat || document.getElementById('wake-lock-heartbeat');
   if (video) {
     try {
-      if (!video.src) {
-        video.src = 'data:video/mp4;base64,AAAAHGZ0eXBNNEVWIExpYmRhdmkxLjAuMQAAAAZpdGVtAAAAAGNvZGMAAAA';
+      if (!video.srcObject && !video.src) {
+        // Use lightweight 1x1 canvas stream - valid on all modern mobile browsers
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, 1, 1);
+        }
+        if (typeof canvas.captureStream === 'function') {
+          video.srcObject = canvas.captureStream(1);
+        } else {
+          video.src = 'data:video/mp4;base64,AAAAHGZ0eXBNNEVWIExpYmRhdmkxLjAuMQAAAAZpdGVtAAAAAGNvZGMAAAA';
+        }
       }
       video.play().then(() => updateWakeBadge(true)).catch(() => {});
     } catch (e) {}
@@ -1660,12 +1679,36 @@ function playChimeSound() {
 // ==========================================
 // Screen-Off Background Audio & OLED Mode
 // ==========================================
+let keepAliveAudioCtx = null;
+function initAudioContextKeepAlive() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    if (!keepAliveAudioCtx) {
+      keepAliveAudioCtx = new AudioCtx();
+      const sampleRate = keepAliveAudioCtx.sampleRate;
+      const buffer = keepAliveAudioCtx.createBuffer(1, sampleRate * 4, sampleRate);
+      const source = keepAliveAudioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      const gain = keepAliveAudioCtx.createGain();
+      gain.gain.value = 0.0001; // inaudible keep-alive
+      source.connect(gain);
+      gain.connect(keepAliveAudioCtx.destination);
+      source.start();
+    }
+    if (keepAliveAudioCtx.state === 'suspended') {
+      keepAliveAudioCtx.resume();
+    }
+  } catch (e) {}
+}
+
 let cachedSilentBlobUrl = null;
 function createSilentAudioBlobUrl() {
   if (cachedSilentBlobUrl) return cachedSilentBlobUrl;
   try {
     const sampleRate = 8000;
-    const numSamples = sampleRate; // 1 second of silence
+    const numSamples = sampleRate * 10; // 10 seconds of silence
     const buffer = new ArrayBuffer(44 + numSamples);
     const view = new DataView(buffer);
     view.setUint32(0, 0x52494646, false); // "RIFF"
@@ -1701,6 +1744,7 @@ function startBackgroundAudioSession() {
     }
     audio.play().catch(() => {});
   }
+  initAudioContextKeepAlive();
   AppState.isPlaying = true;
   AppState.isUserPaused = false;
   if ('mediaSession' in navigator) {
@@ -1921,30 +1965,57 @@ function toggleAudioMode(forceState) {
   }
 }
 
-// Anti-Pause Screen-Lock Interceptors
+// Anti-Pause Screen-Lock Interceptors & Recovery
+let wasPlayingBeforeLock = false;
+let lockResumeTimer = null;
+
+function showLockResumePrompt() {
+  const widget = DOM.lockResumeWidget || document.getElementById('lock-resume-widget');
+  if (!widget) return;
+  const titleEl = DOM.lockResumeTitle || document.getElementById('lock-resume-title');
+  if (titleEl) {
+    titleEl.textContent = AppState.currentTitle || 'PureStream Song';
+  }
+  widget.style.display = 'flex';
+  if (lockResumeTimer) clearTimeout(lockResumeTimer);
+  lockResumeTimer = setTimeout(() => {
+    hideLockResumePrompt();
+  }, 9000);
+}
+
+function hideLockResumePrompt() {
+  const widget = DOM.lockResumeWidget || document.getElementById('lock-resume-widget');
+  if (widget) {
+    widget.style.display = 'none';
+  }
+}
+
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     // Phone locked or screen turned off
     if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+      wasPlayingBeforeLock = true;
       const audio = DOM.bgAudioAnchor || document.getElementById('bg-audio-anchor');
       if (audio && audio.paused) {
         audio.play().catch(() => {});
       }
-      // Counteract YouTube iframe auto-pause on screen off
       sendIframeCommand('playVideo');
-      setTimeout(() => sendIframeCommand('playVideo'), 150);
-      setTimeout(() => sendIframeCommand('playVideo'), 450);
-      setTimeout(() => sendIframeCommand('playVideo'), 1000);
     }
   } else if (document.visibilityState === 'visible') {
-    if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+    // Phone screen turned on / unlocked / tab focused
+    enableScreenWakeLock();
+    if (wasPlayingBeforeLock && AppState.currentVideoId) {
       sendIframeCommand('playVideo');
+      startBackgroundAudioSession();
+      // Show one-tap resume widget in case mobile browser restricted automatic audio unpause
+      showLockResumePrompt();
     }
   }
 }, true);
 
 window.addEventListener('pagehide', () => {
   if (AppState.isPlaying && !AppState.isUserPaused && AppState.currentVideoId) {
+    wasPlayingBeforeLock = true;
     sendIframeCommand('playVideo');
   }
 }, true);
@@ -2911,22 +2982,40 @@ function initEventListeners() {
   // Music & OLED Screen-Off Mode Listeners
   if (DOM.btnAudioMode) DOM.btnAudioMode.addEventListener('click', () => toggleAudioMode());
   if (DOM.btnPlayerScreenOff) DOM.btnPlayerScreenOff.addEventListener('click', () => toggleAudioMode());
+  if (DOM.btnBannerScreenOff) DOM.btnBannerScreenOff.addEventListener('click', () => toggleAudioMode(true));
   if (DOM.btnExitAudioMode) DOM.btnExitAudioMode.addEventListener('click', () => toggleAudioMode(false));
   if (DOM.btnOledPlayPause) DOM.btnOledPlayPause.addEventListener('click', togglePlayPause);
   if (DOM.btnOledRewind) DOM.btnOledRewind.addEventListener('click', () => seekVideo(-10));
   if (DOM.btnOledForward) DOM.btnOledForward.addEventListener('click', () => seekVideo(10));
 
+  // Lock Resume Action Handlers
+  if (DOM.btnLockResumeAction) {
+    DOM.btnLockResumeAction.addEventListener('click', () => {
+      sendIframeCommand('playVideo');
+      startBackgroundAudioSession();
+      hideLockResumePrompt();
+      showToast('▶️ Resumed Playing', 'success');
+    });
+  }
+  if (DOM.btnLockResumeDismiss) {
+    DOM.btnLockResumeDismiss.addEventListener('click', () => {
+      hideLockResumePrompt();
+    });
+  }
+
   // Double-tap anywhere on OLED overlay (except buttons) to wake screen
   if (DOM.audioFocusOverlay) {
     let lastOledTap = 0;
-    DOM.audioFocusOverlay.addEventListener('click', (e) => {
+    const handleOledTap = (e) => {
       if (e.target.closest('button')) return;
       const now = Date.now();
-      if (now - lastOledTap < 350) {
+      if (now - lastOledTap < 380) {
         toggleAudioMode(false);
       }
       lastOledTap = now;
-    });
+    };
+    DOM.audioFocusOverlay.addEventListener('click', handleOledTap);
+    DOM.audioFocusOverlay.addEventListener('touchend', handleOledTap);
   }
 
   // Playlist Queue Navigation & Autoplay
@@ -2981,9 +3070,11 @@ function initEventListeners() {
         } else if (state === 1) {
           AppState.isPlaying = true;
           AppState.isUserPaused = false;
+          wasPlayingBeforeLock = false;
+          hideLockResumePrompt();
           startBackgroundAudioSession();
         } else if (state === 2) {
-          if (document.visibilityState === 'visible') {
+          if (document.visibilityState === 'visible' && !wasPlayingBeforeLock) {
             AppState.isPlaying = false;
           }
         }

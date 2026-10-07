@@ -1205,6 +1205,220 @@ body.ambient-off .player-ambient-ring {
   padding: 0.42rem 0.55rem;
 }
 
+/* Hero Screen-Off Pocket Mode Button */
+.cmd-btn.btn-screen-off-highlight {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.16), rgba(16, 185, 129, 0.28));
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  color: #00ff88;
+  font-weight: 600;
+  box-shadow: 0 0 14px rgba(0, 255, 136, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cmd-btn.btn-screen-off-highlight:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.28), rgba(16, 185, 129, 0.42));
+  border-color: #00ff88;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+.cmd-btn.btn-screen-off-highlight:active {
+  transform: scale(0.96);
+}
+
+/* Mobile Screen-Off & Pocket Mode Banner */
+.mobile-screen-off-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.08) 0%, rgba(13, 148, 136, 0.12) 100%);
+  border: 1px solid rgba(0, 255, 136, 0.28);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin: 0.6rem 0.5rem 0.85rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.screen-off-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.screen-off-banner-icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.screen-off-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.screen-off-banner-text strong {
+  font-size: 0.88rem;
+  color: #00ff88;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.screen-off-banner-text span {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  line-height: 1.25;
+}
+
+.btn-banner-screen-off {
+  background: #00ff88;
+  color: #0a0e17;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.btn-banner-screen-off:hover {
+  background: #22ff99;
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px rgba(0, 255, 136, 0.6);
+}
+
+.btn-banner-screen-off:active {
+  transform: scale(0.95);
+}
+
+/* Floating Lock-Screen Auto-Resume Widget */
+.lock-resume-widget {
+  position: fixed;
+  bottom: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: rgba(18, 24, 38, 0.96);
+  border: 1px solid rgba(0, 255, 136, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 255, 136, 0.3);
+  border-radius: 999px;
+  padding: 8px 14px 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 92vw;
+  animation: slideUpLock 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpLock {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.lock-resume-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lock-resume-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffaa00;
+  box-shadow: 0 0 8px #ffaa00;
+  animation: pulseWake 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.lock-resume-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lock-resume-text strong {
+  font-size: 0.82rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+.lock-resume-text span {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.btn-lock-resume-action {
+  background: #00ff88;
+  color: #050b14;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.35);
+  transition: transform 0.15s ease;
+  touch-action: manipulation;
+}
+
+.btn-lock-resume-action:active {
+  transform: scale(0.92);
+}
+
+.btn-lock-resume-dismiss {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.btn-lock-resume-dismiss:hover {
+  color: #fff;
+}
+
 /* Video Meta Card */
 .video-meta-card {
   padding: 1.1rem 0.6rem 0.6rem;
@@ -2354,6 +2568,32 @@ kbd {
   .toast {
     font-size: 0.82rem;
     padding: 0.65rem 0.95rem;
+  }
+
+  /* Mobile Screen-Off Banner & Lock Resume Placement */
+  .mobile-screen-off-banner {
+    padding: 0.65rem 0.85rem;
+    margin: 0.5rem 0.2rem 0.75rem;
+    flex-direction: row;
+  }
+
+  .screen-off-banner-text strong {
+    font-size: 0.82rem;
+  }
+
+  .screen-off-banner-text span {
+    font-size: 0.72rem;
+  }
+
+  .btn-banner-screen-off {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.76rem;
+  }
+
+  .lock-resume-widget {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    width: calc(100% - 20px);
+    justify-content: space-between;
   }
 }
 
