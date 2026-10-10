@@ -686,6 +686,14 @@ const AppState = {
   isUserPaused: false,
   activePlaylist: null, // Currently active playlist object with currentIndex
   playlistAutoplay: true,
+  autoplay: (function() {
+    try {
+      const saved = localStorage.getItem('purestream_autoplay');
+      return saved === null ? true : saved !== '0';
+    } catch (e) { return true; }
+  })(),
+  currentDuration: 0,
+  lastSearchResults: [],
   recommendationFilter: 'all', // 'all', 'songs', 'playlists'
   engine: 'nocookie', // 'nocookie', 'youtube', 'yewtu', 'piped'
   targetResumeSeconds: 0,
@@ -732,6 +740,15 @@ const DOM = {
   audioFocusOverlay: document.getElementById('audio-focus-overlay'),
   btnExitAudioMode: document.getElementById('btn-exit-audio-mode'),
   btnPlayerScreenOff: document.getElementById('btn-player-screen-off'),
+  btnAutoplayToggle: document.getElementById('btn-autoplay-toggle'),
+  autoplayCountdownOverlay: document.getElementById('autoplay-countdown-overlay'),
+  autoplayCountdownTimer: document.getElementById('autoplay-countdown-timer'),
+  autoplayNextThumb: document.getElementById('autoplay-next-thumb'),
+  autoplayNextTitle: document.getElementById('autoplay-next-title'),
+  autoplayNextChannel: document.getElementById('autoplay-next-channel'),
+  btnAutoplayCancel: document.getElementById('btn-autoplay-cancel'),
+  btnAutoplayPlaynow: document.getElementById('btn-autoplay-playnow'),
+  autoplayProgressBar: document.getElementById('autoplay-progress-bar'),
   oledClock: document.getElementById('oled-clock'),
   oledDate: document.getElementById('oled-date'),
   oledVideoTitle: document.getElementById('oled-video-title'),
@@ -814,6 +831,7 @@ function initApp() {
   try { initCuratedGrids(); } catch (e) { console.error('initCuratedGrids error:', e); }
   try { initTabs(); } catch (e) { console.error('initTabs error:', e); }
   try { loadPreferences(); } catch (e) { console.error('loadPreferences error:', e); }
+  try { initAutoplayState(); } catch (e) { console.error('initAutoplayState error:', e); }
   try { initEventListeners(); } catch (e) { console.error('initEventListeners error:', e); }
   try { updateLibraryCounts(); } catch (e) { console.error('updateLibraryCounts error:', e); }
   try { renderHistoryGrid(); } catch (e) { console.error('renderHistoryGrid error:', e); }
@@ -961,6 +979,10 @@ function startPlaybackTimer() {
     if (AppState.currentPlaybackSeconds % 5 === 0 && AppState.currentVideoId) {
       saveCurrentProgress(AppState.currentVideoId, AppState.currentPlaybackSeconds);
     }
+    // Fallback: If duration is known and playback reached end of video, trigger autoplay
+    if (AppState.currentDuration > 5 && AppState.currentPlaybackSeconds >= AppState.currentDuration) {
+      handleVideoEnded();
+    }
   }, 1000);
 }
 
@@ -1097,6 +1119,9 @@ function closePlayerAndBackToFeed() {
 
 async function loadVideo(videoId, triggerAutoScroll = true, customTitle = null, customChannel = null, customThumb = null) {
   if (!videoId) return;
+
+  cancelAutoplayCountdown();
+  AppState.currentDuration = 0;
 
   // Make watch page player visible
   if (DOM.playerArena) {
@@ -1336,6 +1361,7 @@ async function performFallbackSearch(query, longOnly) {
 }
 
 function renderSearchResults(videos) {
+  AppState.lastSearchResults = Array.isArray(videos) ? videos : [];
   DOM.gridSearch.innerHTML = '';
   DOM.searchResultCount.textContent = videos.length;
 
@@ -1815,18 +1841,10 @@ function updateMediaSession(title, channel, thumb) {
         seekVideo(details && details.seekOffset ? details.seekOffset : 10);
       }],
       ['previoustrack', () => {
-        if (AppState.activePlaylist) {
-          playPreviousPlaylistItem();
-        } else {
-          seekVideo(-10);
-        }
+        playPreviousAutoplayVideo();
       }],
       ['nexttrack', () => {
-        if (AppState.activePlaylist) {
-          playNextPlaylistItem();
-        } else {
-          seekVideo(10);
-        }
+        playNextAutoplayVideo();
       }],
       ['stop', () => {
         AppState.isPlaying = false;
@@ -2537,16 +2555,276 @@ function playPlaylistItemByIndex(index) {
 }
 
 function playNextPlaylistItem() {
-  if (!AppState.activePlaylist || !AppState.activePlaylist.videos) return;
-  const nextIdx = (AppState.activePlaylist.currentIndex + 1) % AppState.activePlaylist.videos.length;
-  playPlaylistItemByIndex(nextIdx);
+  if (AppState.activePlaylist && AppState.activePlaylist.videos) {
+    const nextIdx = (AppState.activePlaylist.currentIndex + 1) % AppState.activePlaylist.videos.length;
+    playPlaylistItemByIndex(nextIdx);
+  } else {
+    playNextAutoplayVideo();
+  }
 }
 
 function playPreviousPlaylistItem() {
-  if (!AppState.activePlaylist || !AppState.activePlaylist.videos) return;
-  const len = AppState.activePlaylist.videos.length;
-  const prevIdx = (AppState.activePlaylist.currentIndex - 1 + len) % len;
-  playPlaylistItemByIndex(prevIdx);
+  if (AppState.activePlaylist && AppState.activePlaylist.videos) {
+    const len = AppState.activePlaylist.videos.length;
+    const prevIdx = (AppState.activePlaylist.currentIndex - 1 + len) % len;
+    playPlaylistItemByIndex(prevIdx);
+  } else {
+    playPreviousAutoplayVideo();
+  }
+}
+
+// ==========================================
+// YouTube-Style Continuous Autoplay System
+// ==========================================
+let autoplayCountdownTimer = null;
+let autoplayCountdownSeconds = 4;
+let currentPendingNextVideo = null;
+let isAutoplayTransitioning = false;
+
+function initAutoplayState() {
+  updateAutoplayButtonUI();
+}
+
+function updateAutoplayButtonUI() {
+  const btn = DOM.btnAutoplayToggle || document.getElementById('btn-autoplay-toggle');
+  if (!btn) return;
+  const badge = btn.querySelector('.autoplay-switch-badge');
+  if (AppState.autoplay) {
+    btn.classList.add('active');
+    btn.title = 'Autoplay is ON: Next video will start automatically';
+    if (badge) badge.textContent = 'ON';
+  } else {
+    btn.classList.remove('active');
+    btn.title = 'Autoplay is OFF: Videos will stop when finished';
+    if (badge) badge.textContent = 'OFF';
+  }
+}
+
+function toggleAutoplay(forceState) {
+  if (typeof forceState === 'boolean') {
+    AppState.autoplay = forceState;
+  } else {
+    AppState.autoplay = !AppState.autoplay;
+  }
+  AppState.playlistAutoplay = AppState.autoplay;
+  try {
+    localStorage.setItem('purestream_autoplay', AppState.autoplay ? '1' : '0');
+  } catch (e) {}
+
+  updateAutoplayButtonUI();
+  if (DOM.btnPlaylistAutoplay) {
+    if (AppState.autoplay) {
+      DOM.btnPlaylistAutoplay.classList.add('active');
+      const label = DOM.btnPlaylistAutoplay.querySelector('span:last-child');
+      if (label) label.textContent = 'Autoplay Next';
+    } else {
+      DOM.btnPlaylistAutoplay.classList.remove('active');
+      const label = DOM.btnPlaylistAutoplay.querySelector('span:last-child');
+      if (label) label.textContent = 'Autoplay: OFF';
+    }
+  }
+
+  if (AppState.autoplay) {
+    showToast('🔁 Autoplay Next Video: ON (YouTube Style)', 'success');
+  } else {
+    cancelAutoplayCountdown();
+    showToast('Autoplay Next Video: OFF', 'info');
+  }
+}
+
+function getNextAutoplayVideo() {
+  const currentId = AppState.currentVideoId;
+
+  // 1. If currently in an active playlist, pick the next playlist track
+  if (AppState.activePlaylist && Array.isArray(AppState.activePlaylist.videos) && AppState.activePlaylist.videos.length > 0) {
+    const pl = AppState.activePlaylist;
+    const nextIdx = (pl.currentIndex + 1) % pl.videos.length;
+    const nextItem = pl.videos[nextIdx];
+    if (nextItem) {
+      return {
+        ...nextItem,
+        source: 'playlist',
+        playlistIndex: nextIdx
+      };
+    }
+  }
+
+  // 2. If user searched and clicked a video from search results, pick the next search result
+  if (Array.isArray(AppState.lastSearchResults) && AppState.lastSearchResults.length > 0) {
+    const currIdx = AppState.lastSearchResults.findIndex(v => v.id === currentId);
+    if (currIdx >= 0 && currIdx + 1 < AppState.lastSearchResults.length) {
+      return {
+        ...AppState.lastSearchResults[currIdx + 1],
+        source: 'search'
+      };
+    }
+  }
+
+  // 3. Find next video from the current category's queue
+  const category = getVideoCategory(currentId, AppState.currentTitle, AppState.currentChannel);
+  let categoryPool = [];
+  if (category === 'music') {
+    categoryPool = [...(CURATED_VIDEOS.songs || []), ...(CURATED_VIDEOS.lofi || [])];
+  } else if (category === 'coding') {
+    categoryPool = CURATED_VIDEOS.coding || [];
+  } else if (category === 'study') {
+    categoryPool = [...(CURATED_VIDEOS.study || []), ...(CURATED_VIDEOS.upsc || [])];
+  } else {
+    categoryPool = getAllCuratedVideos();
+  }
+
+  const poolIdx = categoryPool.findIndex(v => v.id === currentId);
+  if (poolIdx >= 0 && poolIdx + 1 < categoryPool.length) {
+    return { ...categoryPool[poolIdx + 1], source: 'category' };
+  } else if (categoryPool.length > 0) {
+    const candidate = categoryPool.find(v => v.id !== currentId) || categoryPool[0];
+    if (candidate) return { ...candidate, source: 'category' };
+  }
+
+  // 4. Fallback to all curated videos
+  const allList = getAllCuratedVideos();
+  const allIdx = allList.findIndex(v => v.id === currentId);
+  if (allIdx >= 0 && allIdx + 1 < allList.length) {
+    return { ...allList[allIdx + 1], source: 'all' };
+  }
+
+  return allList.find(v => v.id !== currentId) || allList[0] || null;
+}
+
+function handleVideoEnded() {
+  if (isAutoplayTransitioning) return;
+
+  // 1. If Loop is active, replay current video
+  if (AppState.isLooping) {
+    sendIframeCommand('seekTo', [0, true]);
+    sendIframeCommand('playVideo');
+    return;
+  }
+
+  // 2. If Autoplay is disabled, do nothing
+  if (!AppState.autoplay) {
+    return;
+  }
+
+  // 3. Find next video
+  const nextVideo = getNextAutoplayVideo();
+  if (!nextVideo || !nextVideo.id) {
+    return;
+  }
+
+  currentPendingNextVideo = nextVideo;
+
+  // 4. In OLED Screen-Off (Music) Mode, seamlessly play next track with 1s pause
+  if (AppState.audioMode) {
+    isAutoplayTransitioning = true;
+    showToast(`🎵 Next: ${nextVideo.title}`, 'info');
+    setTimeout(() => {
+      isAutoplayTransitioning = false;
+      executeAutoplayNext(nextVideo);
+    }, 1000);
+    return;
+  }
+
+  // 5. In normal video mode, start the YouTube-style countdown overlay
+  startAutoplayCountdown(nextVideo);
+}
+
+function startAutoplayCountdown(nextVideo) {
+  cancelAutoplayCountdown();
+  currentPendingNextVideo = nextVideo;
+
+  const overlay = DOM.autoplayCountdownOverlay || document.getElementById('autoplay-countdown-overlay');
+  if (!overlay) {
+    executeAutoplayNext(nextVideo);
+    return;
+  }
+
+  const thumbEl = DOM.autoplayNextThumb || document.getElementById('autoplay-next-thumb');
+  const titleEl = DOM.autoplayNextTitle || document.getElementById('autoplay-next-title');
+  const channelEl = DOM.autoplayNextChannel || document.getElementById('autoplay-next-channel');
+  const timerEl = DOM.autoplayCountdownTimer || document.getElementById('autoplay-countdown-timer');
+  const progressBar = DOM.autoplayProgressBar || document.getElementById('autoplay-progress-bar');
+
+  if (thumbEl) thumbEl.src = nextVideo.thumb || `https://i.ytimg.com/vi/${nextVideo.id}/hqdefault.jpg`;
+  if (titleEl) titleEl.textContent = nextVideo.title || 'Next Video';
+  if (channelEl) channelEl.textContent = nextVideo.channel || 'Up Next';
+
+  autoplayCountdownSeconds = 4;
+  if (timerEl) timerEl.textContent = `Playing in ${autoplayCountdownSeconds}s...`;
+
+  if (progressBar) {
+    progressBar.style.transition = 'none';
+    progressBar.style.width = '0%';
+    setTimeout(() => {
+      progressBar.style.transition = 'width 4s linear';
+      progressBar.style.width = '100%';
+    }, 50);
+  }
+
+  overlay.style.display = 'flex';
+
+  autoplayCountdownTimer = setInterval(() => {
+    autoplayCountdownSeconds -= 1;
+    if (timerEl) {
+      timerEl.textContent = autoplayCountdownSeconds > 0 ? `Playing in ${autoplayCountdownSeconds}s...` : 'Starting...';
+    }
+
+    if (autoplayCountdownSeconds <= 0) {
+      cancelAutoplayCountdown();
+      executeAutoplayNext(nextVideo);
+    }
+  }, 1000);
+}
+
+function cancelAutoplayCountdown() {
+  if (autoplayCountdownTimer) {
+    clearInterval(autoplayCountdownTimer);
+    autoplayCountdownTimer = null;
+  }
+  currentPendingNextVideo = null;
+  const overlay = DOM.autoplayCountdownOverlay || document.getElementById('autoplay-countdown-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+  }
+}
+
+function executeAutoplayNext(nextVideo) {
+  cancelAutoplayCountdown();
+  if (!nextVideo || !nextVideo.id) return;
+
+  if (nextVideo.source === 'playlist' && typeof nextVideo.playlistIndex === 'number' && AppState.activePlaylist) {
+    AppState.activePlaylist.currentIndex = nextVideo.playlistIndex;
+    renderActivePlaylistPanel();
+  }
+
+  loadVideo(nextVideo.id, false, nextVideo.title, nextVideo.channel, nextVideo.thumb);
+  showToast(`▶️ Up Next: ${nextVideo.title}`, 'success');
+}
+
+function playNextAutoplayVideo() {
+  cancelAutoplayCountdown();
+  const nextVideo = getNextAutoplayVideo();
+  if (nextVideo) {
+    executeAutoplayNext(nextVideo);
+  } else {
+    showToast('No more videos in queue', 'info');
+  }
+}
+
+function playPreviousAutoplayVideo() {
+  cancelAutoplayCountdown();
+  if (AppState.activePlaylist) {
+    playPreviousPlaylistItem();
+    return;
+  }
+  const history = getHistory();
+  if (history && history.length > 1) {
+    const prev = history[1]; // Most recent previous item
+    loadVideo(prev.id, false, prev.title, prev.channel, prev.thumb);
+    showToast(`⏮️ Previous: ${prev.title}`, 'info');
+    return;
+  }
+  seekVideo(-15);
 }
 
 function getVideoCategory(videoId, title = '', channel = '') {
@@ -3053,6 +3331,26 @@ function initEventListeners() {
     });
   });
 
+  // Autoplay Next Toggle & Countdown Action Handlers
+  if (DOM.btnAutoplayToggle) {
+    DOM.btnAutoplayToggle.addEventListener('click', () => toggleAutoplay());
+  }
+  if (DOM.btnAutoplayCancel) {
+    DOM.btnAutoplayCancel.addEventListener('click', () => {
+      cancelAutoplayCountdown();
+      showToast('Autoplay cancelled', 'info');
+    });
+  }
+  if (DOM.btnAutoplayPlaynow) {
+    DOM.btnAutoplayPlaynow.addEventListener('click', () => {
+      if (currentPendingNextVideo) {
+        executeAutoplayNext(currentPendingNextVideo);
+      } else {
+        playNextAutoplayVideo();
+      }
+    });
+  }
+
   // YouTube Iframe PostMessage Listener for Autoplay Next Track
   window.addEventListener('message', (event) => {
     if (!event.data) return;
@@ -3064,10 +3362,9 @@ function initEventListeners() {
       if (data && data.event === 'onStateChange') {
         const state = data.info; // 0 = ended, 1 = playing, 2 = paused
         if (state === 0) {
-          if (AppState.activePlaylist && AppState.playlistAutoplay) {
-            playNextPlaylistItem();
-          }
+          handleVideoEnded();
         } else if (state === 1) {
+          cancelAutoplayCountdown();
           AppState.isPlaying = true;
           AppState.isUserPaused = false;
           wasPlayingBeforeLock = false;
@@ -3077,6 +3374,24 @@ function initEventListeners() {
           if (document.visibilityState === 'visible' && !wasPlayingBeforeLock) {
             AppState.isPlaying = false;
           }
+        }
+      } else if (data && data.event === 'infoDelivery' && data.info) {
+        if (typeof data.info.duration === 'number' && data.info.duration > 0) {
+          AppState.currentDuration = data.info.duration;
+        }
+        if (typeof data.info.currentTime === 'number') {
+          AppState.currentPlaybackSeconds = Math.floor(data.info.currentTime);
+          // If playback reached near end of duration (within 0.8s), trigger video end
+          if (AppState.currentDuration > 5 && data.info.currentTime >= AppState.currentDuration - 0.8) {
+            handleVideoEnded();
+          }
+        }
+        if (data.info.playerState === 0) {
+          handleVideoEnded();
+        } else if (data.info.playerState === 1) {
+          cancelAutoplayCountdown();
+          AppState.isPlaying = true;
+          AppState.isUserPaused = false;
         }
       }
     } catch (e) {}

@@ -245,6 +245,33 @@
           <video id="wake-lock-heartbeat" loop playsinline muted style="display:none; width:1px; height:1px;"></video>
         </div>
 
+        <!-- YouTube-Style Autoplay Next Countdown Overlay -->
+        <div id="autoplay-countdown-overlay" class="autoplay-countdown-overlay" style="display:none;" aria-live="polite">
+          <div class="autoplay-countdown-card">
+            <div class="autoplay-countdown-top">
+              <span class="autoplay-badge-tag">UP NEXT</span>
+              <span class="autoplay-countdown-timer" id="autoplay-countdown-timer">Playing in 4s...</span>
+            </div>
+            <div class="autoplay-next-preview">
+              <img id="autoplay-next-thumb" class="autoplay-next-thumb" src="" alt="Next Video Thumbnail" />
+              <div class="autoplay-next-meta">
+                <h4 id="autoplay-next-title" class="autoplay-next-title">Next Video Title</h4>
+                <p id="autoplay-next-channel" class="autoplay-next-channel">Channel Name</p>
+              </div>
+            </div>
+            <div class="autoplay-countdown-actions">
+              <button id="btn-autoplay-cancel" class="btn-autoplay-cancel" type="button">Cancel</button>
+              <button id="btn-autoplay-playnow" class="btn-autoplay-playnow" type="button">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>Play Now</span>
+              </button>
+            </div>
+            <div class="autoplay-progress-track">
+              <div id="autoplay-progress-bar" class="autoplay-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Quality & Mobile Touch Command Bar -->
         <div class="player-command-bar">
           <div class="command-group left">
@@ -269,6 +296,15 @@
             </button>
             <button id="btn-touch-forward" class="cmd-btn" title="Forward 10 Seconds">
               <span>10s ⏩</span>
+            </button>
+
+            <!-- YouTube-Style Autoplay Toggle Button -->
+            <button id="btn-autoplay-toggle" class="cmd-btn btn-autoplay-toggle active" title="Autoplay: Automatically start next video (YouTube style)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+              </svg>
+              <span class="autoplay-label">Autoplay</span>
+              <span class="autoplay-switch-badge">ON</span>
             </button>
 
             <!-- Screen Off / Music Mode Hero Button -->
